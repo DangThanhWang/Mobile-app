@@ -1,0 +1,14 @@
+Dog : Con chó
+Cat : Con mèo
+Elephant : Con voi
+Mouse : Con chuột
+Pig : Con lợn
+Cow : Con bò
+Bird : Con chim
+Koala : Con gấu túi
+Reindeer : Con nai
+Fox : Con cáo
+Dolphin : Con cá heo
+Crocodile : Con cá sấu
+Snake : Con rắn
+Bear : Con gấu

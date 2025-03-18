@@ -1,0 +1,84 @@
+name: app
+description: A new Flutter project.
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.1.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  #Firebase
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.0.0
+  firebase_storage: ^12.3.7
+  cloud_firestore: ^5.5.0
+  google_sign_in: ^5.4.3
+
+  #Icon
+  line_awesome_flutter: ^1.0.2
+
+  #Image
+  image_picker: ^0.8.8+7
+
+  english_words: ^4.0.0
+  provider: ^6.0.0
+  get: ^4.6.6
+  iconsax: ^0.0.8
+  iconly: ^1.0.1
+  hugeicons: ^0.0.7
+  flutter_svg: ^2.0.10+1
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.3.2
+  percent_indicator: ^4.2.3
+  audioplayers: ^6.1.0
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.0.2
+  fl_chart: ^0.69.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  sqflite: ^2.0.0+4
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/images/
+    - assets/images/home/
+    - assets/images/raster/
+    - assets/images/users/
+    - lib/sources/
+    - assets/images/profiles/
+    - assets/images/home/
+    - assets/data/
+    - assets/audios/
+    - assets/audios/ipa/
+    - assets/svg/
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato-Black.ttf
+          weight: 500
+        - asset: assets/fonts/Lato-Bold.ttf
+          weight: 900
+        - asset: assets/fonts/Lato-Regular.ttf
+          weight: 700
+        - asset: assets/fonts/Lato-Light.ttf
+          weight: 300
+    - family: Rubik
+      fonts:
+        - asset: assets/fonts/Rubik-Bold.ttf
+          weight: 900
+        - asset: assets/fonts/Rubik-Regular.ttf
+          weight: 700
+        - asset: assets/fonts/Rubik-Light.ttf

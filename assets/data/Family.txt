@@ -1,0 +1,15 @@
+Family : Gia đình
+Mother : Mẹ
+Father : Bố
+Brother : Anh/em trai
+Sister : Chị/em gái 
+Son : Con trai
+Daughter : Con gái
+Niece : Cháu gái
+Nephew : Cháu trai
+Parents : bố mẹ
+Grandparents : ông bà
+Grandmother : bà
+Grandfather : Ông
+Grandson : Cháu trai
+Granddaughter : Cháu gái

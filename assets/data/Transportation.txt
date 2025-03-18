@@ -1,0 +1,13 @@
+Car: Xe ô tô
+Bike: Xe đạp
+Couch:  Xe khách
+Subways: Tàu điện ngầm
+train: Tàu hỏa
+Ship: Con tàu
+Boat: Con thuyền
+Motorbike: Xe máy
+Bus: xe buýt
+Plane: Máy bay
+Helicopter: Trực thăng
+Balloon: Khinh khí cầu
+
