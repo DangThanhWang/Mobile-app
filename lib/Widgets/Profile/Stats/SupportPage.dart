@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class SupportPage extends StatelessWidget {
-  final _formSupport = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,12 +25,13 @@ class SupportPage extends StatelessWidget {
                 items: [
                   {
                     'title': 'Tại sao khóa học của tôi thay đổi?',
-                    'content': 'Khóa học có thể được cập nhật để cải thiện nội dung học tập và thêm tính năng mới.',
+                    'content':
+                        'Khóa học có thể được cập nhật để cải thiện nội dung học tập và thêm tính năng mới.',
                   },
                   {
                     'title': 'Bảng xếp hạng là gì?',
                     'content':
-                    'Bảng xếp hạng là nơi bạn có thể vui vẻ thi đua thành tích hàng tuần cùng những người học khác. Hãy ghé mục Bảng xếp hạng trên ứng dụng để tham gia thi đua nhé!',
+                        'Bảng xếp hạng là nơi bạn có thể vui vẻ thi đua thành tích hàng tuần cùng những người học khác. Hãy ghé mục Bảng xếp hạng trên ứng dụng để tham gia thi đua nhé!',
                   },
                 ],
               ),
@@ -42,14 +41,15 @@ class SupportPage extends StatelessWidget {
                 title: 'Quản lý tài khoản',
                 items: [
                   {
-                    'title': 'Làm cách nào để đổi tên người dùng hoặc địa chỉ email?',
+                    'title':
+                        'Làm cách nào để đổi tên người dùng hoặc địa chỉ email?',
                     'content':
-                    'Nếu bạn muốn thay đổi tên người dùng hoặc địa chỉ email của tài khoản Tripybara, hãy tới phần Hồ sơ và sửa tên người dùng hoặc địa chỉ email. Nhớ ấn "Lưu thay đổi" sau khi chỉnh sửa nhé.',
+                        'Nếu bạn muốn thay đổi tên người dùng hoặc địa chỉ email của tài khoản Tripybara, hãy tới phần Hồ sơ và sửa tên người dùng hoặc địa chỉ email. Nhớ ấn "Lưu thay đổi" sau khi chỉnh sửa nhé.',
                   },
                   {
                     'title': 'Tôi gặp vấn đề khi truy cập tài khoản.',
                     'content':
-                    'Nếu bạn quên mật khẩu và cần đặt mật khẩu mới, hãy nhấn vào "Quên mật khẩu" ở màn hình đăng nhập ứng dụng. Chúng tôi sẽ gửi một đường dẫn tới địa chỉ email đó, bạn có thể sử dụng đường dẫn này để tạo một mật khẩu mới.',
+                        'Nếu bạn quên mật khẩu và cần đặt mật khẩu mới, hãy nhấn vào "Quên mật khẩu" ở màn hình đăng nhập ứng dụng. Chúng tôi sẽ gửi một đường dẫn tới địa chỉ email đó, bạn có thể sử dụng đường dẫn này để tạo một mật khẩu mới.',
                   },
                 ],
               ),
@@ -60,7 +60,8 @@ class SupportPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContainer(BuildContext context, {required String title, required List<Map<String, String>> items}) {
+  Widget _buildContainer(BuildContext context,
+      {required String title, required List<Map<String, String>> items}) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -97,7 +98,8 @@ class SupportPage extends StatelessWidget {
               ),
             ),
           ),
-          ...items.map((item) => buildListItem(item['title']!, item['content']!)).toList(),
+          ...items
+              .map((item) => buildListItem(item['title']!, item['content']!)),
         ],
       ),
     );
@@ -112,6 +114,8 @@ class SupportPage extends StatelessWidget {
           fontSize: 16,
         ),
       ),
+      iconColor: Colors.black,
+      collapsedIconColor: Colors.black,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -124,8 +128,6 @@ class SupportPage extends StatelessWidget {
           ),
         ),
       ],
-      iconColor: Colors.black,
-      collapsedIconColor: Colors.black,
     );
   }
 }

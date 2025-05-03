@@ -1,7 +1,6 @@
 import 'package:app/Widgets/Dictionary/Word.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:app/helpers/dbHelper.dart';
 
 class Dictionary extends StatefulWidget {
   const Dictionary({super.key});
@@ -78,7 +77,8 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Dictionary", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Dictionary",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF81C784),
         centerTitle: true,
       ),
@@ -175,7 +175,8 @@ class _SearchPageState extends State<SearchPage> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.copy),
-                                onPressed: () => _copyToClipboard(_searchResult!.word),
+                                onPressed: () =>
+                                    _copyToClipboard(_searchResult!.word),
                               ),
                             ],
                           ),
@@ -190,7 +191,8 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                           Text(
                             _searchResult!.definition,
-                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black87),
                           ),
                           const SizedBox(height: 16),
                           if (_searchResult!.example.isNotEmpty)
@@ -207,7 +209,8 @@ class _SearchPageState extends State<SearchPage> {
                                 ),
                                 Text(
                                   _searchResult!.example,
-                                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Colors.black87),
                                 ),
                                 const SizedBox(height: 16),
                               ],
@@ -226,7 +229,8 @@ class _SearchPageState extends State<SearchPage> {
                                 ),
                                 Text(
                                   _searchResult!.synonyms,
-                                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Colors.black87),
                                 ),
                               ],
                             ),
@@ -253,5 +257,3 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 }
-
-

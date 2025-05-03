@@ -1,7 +1,15 @@
+// ignore: file_names
+import 'dart:convert';
+
+import 'package:app/Database/mongoDB.dart';
+import 'package:app/Definitons/global.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:mongo_dart/mongo_dart.dart' hide State, Center;
+// ignore: depend_on_referenced_packages
+import 'package:crypto/crypto.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -18,6 +26,12 @@ class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  String _hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
   void _togglePasswordVisibility() {
     setState(() {
       _obscureText = !_obscureText;
@@ -31,7 +45,7 @@ class _LoginState extends State<Login> {
       if (googleUser == null) return; // Người dùng hủy đăng nhập
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+          await googleUser.authentication;
 
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -39,7 +53,7 @@ class _LoginState extends State<Login> {
       );
 
       final UserCredential userCredential =
-      await _auth.signInWithCredential(credential);
+          await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
 
       if (user != null) {
@@ -48,9 +62,14 @@ class _LoginState extends State<Login> {
 
         // Điều hướng đến trang Home và truyền thông tin người dùng
         Navigator.pushReplacementNamed(
+          // ignore: use_build_context_synchronously
           context,
           '/home',
-          arguments: {'name': name, 'photoUrl': photoUrl},
+          arguments: {
+            'name': name,
+            'photoUrl': photoUrl,
+            'uid': user.uid,
+          },
         );
       }
     } catch (e) {
@@ -70,15 +89,44 @@ class _LoginState extends State<Login> {
     }
 
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
+      final usersCollection = await MongoDBDatabase.getCollection('Users');
+      final hashedPassword = _hashPassword(_passwordController.text.trim());
 
-      Navigator.pushReplacementNamed(context, '/home');
+      final existingUser = await usersCollection.findOne(
+          where.eq('email', _emailController.text.trim().toLowerCase()));
+      print(existingUser);
+      if (existingUser == null) {
+        setState(() {
+          _errorMessage = 'Email or password is incorrect.';
+        });
+        return;
+      }
+      if (existingUser['password'] != hashedPassword) {
+        setState(() {
+          _errorMessage = 'Email or password is incorrect.';
+        });
+        return;
+      }
+      // Đăng nhập thành công
+      String? name = existingUser['name'];
+      String? photoUrl = existingUser['photoUrl'];
+      String? uid = existingUser['userId'];
+      globalUserId = uid;
+      print(globalUserId);
+
+      // Điều hướng đến trang Home và truyền thông tin người dùng
+      Navigator.pushReplacementNamed(
+        // ignore: use_build_context_synchronously
+        context,
+        '/home',
+        arguments: {
+          'name': name,
+          'photoUrl': photoUrl,
+        },
+      );
     } catch (e) {
       setState(() {
-        _errorMessage = 'Lỗi đăng nhập email: $e';
+        _errorMessage = 'Email or password is incorrect.';
       });
     }
   }
@@ -120,7 +168,9 @@ class _LoginState extends State<Login> {
                 prefixIcon: Icon(LineAwesomeIcons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscureText ? LineAwesomeIcons.eye_slash : LineAwesomeIcons.eye,
+                    _obscureText
+                        ? LineAwesomeIcons.eye_slash
+                        : LineAwesomeIcons.eye,
                   ),
                   onPressed: _togglePasswordVisibility,
                 ),
@@ -147,7 +197,6 @@ class _LoginState extends State<Login> {
               onPressed: _signInWithEmailPassword,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD3B591),
-                minimumSize: Size(double.infinity, 50),
               ),
               child: Text(
                 'LOG IN',

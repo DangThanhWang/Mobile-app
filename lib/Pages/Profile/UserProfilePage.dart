@@ -1,6 +1,7 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:app/Definitons/size_config.dart';
 import 'package:app/Pages/Auth/Login.dart';
-import 'package:app/Pages/Auth/SignUp.dart';
 import 'package:app/Widgets/Profile/Stats/EditProfilePage.dart';
 import 'package:app/Widgets/Profile/Stats/FeedbackForm.dart';
 import 'package:app/Widgets/Profile/Stats/SettingPage.dart';
@@ -17,7 +18,8 @@ class UserProfilePage extends StatefulWidget {
   _UserProfilePage createState() => _UserProfilePage();
 }
 
-class _UserProfilePage extends State<UserProfilePage> with SingleTickerProviderStateMixin {
+class _UserProfilePage extends State<UserProfilePage>
+    with SingleTickerProviderStateMixin {
   final User? user = FirebaseAuth.instance.currentUser;
   String? userName;
   String? userPhotoUrl;
@@ -30,14 +32,6 @@ class _UserProfilePage extends State<UserProfilePage> with SingleTickerProviderS
   }
 
   // Làm mới dữ liệu người dùng từ Firebase
-  Future<void> _refreshUserData() async {
-    await user?.reload();
-    final refreshedUser = FirebaseAuth.instance.currentUser;
-    setState(() {
-      userName = refreshedUser?.displayName ?? 'Capybara';
-      userPhotoUrl = refreshedUser?.photoURL;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,17 +47,16 @@ class _UserProfilePage extends State<UserProfilePage> with SingleTickerProviderS
               SizedBox(
                 width: 130,
                 height: 130,
-                child: Container(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: Image(
-                      image: userPhotoUrl != null
-                          ? NetworkImage(userPhotoUrl!)
-                          : const AssetImage('assets/images/avatar_default.jpeg') as ImageProvider,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: Image(
+                    image: userPhotoUrl != null
+                        ? NetworkImage(userPhotoUrl!)
+                        : const AssetImage('assets/images/avatar_default.jpeg')
+                            as ImageProvider,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -84,7 +77,8 @@ class _UserProfilePage extends State<UserProfilePage> with SingleTickerProviderS
                 onPress: () async {
                   final result = await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                    MaterialPageRoute(
+                        builder: (context) => const EditProfilePage()),
                   );
                   if (result != null && mounted) {
                     setState(() {
@@ -148,7 +142,6 @@ class _UserProfilePage extends State<UserProfilePage> with SingleTickerProviderS
   }
 }
 
-
 class ProfileMenuWidget extends StatelessWidget {
   const ProfileMenuWidget({
     super.key,
@@ -189,19 +182,20 @@ class ProfileMenuWidget extends StatelessWidget {
           color: textColor,
         ),
       ),
-      trailing: endIcon? Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: const Icon(
-          LineAwesomeIcons.angle_right,
-          size: 18,
-          color: Colors.black,
-        ),
-      ) : null,
+      trailing: endIcon
+          ? Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: const Icon(
+                LineAwesomeIcons.angle_right,
+                size: 18,
+                color: Colors.black,
+              ),
+            )
+          : null,
     );
   }
 }
-

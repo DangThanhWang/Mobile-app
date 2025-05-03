@@ -12,10 +12,10 @@ class RankingListItem extends StatelessWidget {
   final int number;
   final bool check;
   const RankingListItem({
-    Key? key,
+    super.key,
     required this.number,
     required this.check,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

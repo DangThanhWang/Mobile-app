@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app/Definitons/Color.dart';
 import 'package:app/helpers/DotsIndicator.dart';
-
-import '../Dictionary/Dictionary.dart';
-import '../Dictionary/FloatingDictionaryButton.dart';
 
 class LevelHome extends StatelessWidget {
   final int currentLevel;
@@ -57,7 +53,6 @@ class LevelHome extends StatelessWidget {
               //   },
               // ),
             ],
-
           ),
           const SizedBox(height: 10),
           DotsIndicator(

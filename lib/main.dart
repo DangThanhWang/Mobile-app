@@ -1,16 +1,30 @@
+import 'package:app/Database/mongoDB.dart';
+import 'package:app/Definitons/Constants.dart';
 import 'package:app/Pages/Auth/GetStarted.dart';
 import 'package:app/Pages/Page/MainHome.dart';
+import 'package:app/Widgets/ChatBox/AllChatsScreen.dart';
+import 'package:app/Widgets/ChatBox/CreateRoomScreen.dart';
+import 'package:app/Widgets/ChatBox/HelpCenter.dart';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 import 'Pages/Auth/Login.dart';
 import 'Pages/Auth/SignUp.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await MongoDBDatabase.connect();
+
+  Gemini.init(
+    apiKey: API_KEY,
+    enableDebugging: true,
+  );
+
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(MyApp());
 }
@@ -30,6 +44,9 @@ class MyApp extends StatelessWidget {
         '/home': (context) => MainPage(),
         '/login': (context) => Login(),
         '/signup': (context) => SignUp(),
+        '/all-chats': (context) => AllChatsScreen(),
+        '/new-chat': (context) => CreateRoomScreen(),
+        '/help': (context) => HelpScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../helpers/dbHelper.dart';
 import '../Dictionary/Dictionary.dart';
-import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
 
 void main() => runApp(MyApp());
 
@@ -30,12 +27,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class FlashcardList extends StatefulWidget {
   List<Map<String, String>> words = [];
 
   FlashcardList({required this.words});
 
   @override
+  // ignore: library_private_types_in_public_api
   _FlashcardListState createState() => _FlashcardListState();
 }
 
@@ -57,7 +56,7 @@ class _FlashcardListState extends State<FlashcardList> {
     // Debugging statement
     return words.isEmpty
         ? Center(child: CircularProgressIndicator())
-        : Container(
+        : SizedBox(
             //color: Colors.brown,
             height: 400,
             // decoration: BoxDecoration(
@@ -116,6 +115,7 @@ class Flashcard extends StatefulWidget {
   Flashcard({required this.word, required this.definition});
 
   @override
+  // ignore: library_private_types_in_public_api
   _FlashcardState createState() => _FlashcardState();
 }
 
@@ -179,7 +179,8 @@ class _FlashcardState extends State<Flashcard> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(8), // Match the Card's border radius
+          borderRadius:
+              BorderRadius.circular(8), // Match the Card's border radius
         ),
         child: Card(
           color: Colors.transparent, // Make the Card itself transparent
@@ -198,7 +199,7 @@ class _FlashcardState extends State<Flashcard> {
                 child: Text(
                   text,
                   style: TextStyle(
-                    color: Colors.white,
+                      color: Colors.white,
                       fontFamily: 'Rubik',
                       fontSize: 40,
                       fontWeight: FontWeight.normal),

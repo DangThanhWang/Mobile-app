@@ -16,3 +16,15 @@ double animatedPositionedLEftValue(int currentIndex) {
       return 0;
   }
 }
+
+// ignore: constant_identifier_names
+const API_KEY = 'AIzaSyDoD2FNKWnr6xtGGJwNCCQ6tmjtHqua8JE';
+
+// ignore: constant_identifier_names
+const MONGO_URL =
+    'mongodb+srv://dinhductai2004:Tai03102004@englishapp.3ryiky2.mongodb.net/EnglishApp?retryWrites=true&w=majority&appName=EnglishApp';
+
+// ignore: constant_identifier_names
+const COLLECTION_Users = 'Users';
+// ignore: constant_identifier_names
+const COLLECTION_Rooms = 'Rooms';

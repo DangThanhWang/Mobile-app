@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
@@ -11,6 +10,7 @@ class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _EditProfilePageState createState() => _EditProfilePageState();
 }
 
@@ -91,7 +91,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(LineAwesomeIcons.angle_left)),
+        leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(LineAwesomeIcons.angle_left)),
         title: const Text('Chỉnh sửa hồ sơ'),
         centerTitle: true,
       ),
@@ -109,7 +111,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   backgroundImage: _photoUrl != null
                       ? NetworkImage(_photoUrl!)
                       : const AssetImage('assets/images/avatar_default.jpeg')
-                  as ImageProvider,
+                          as ImageProvider,
                   child: const Icon(
                     Icons.camera_alt,
                     size: 30,
@@ -138,23 +140,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   labelText: 'Email',
                   border: OutlineInputBorder(),
                 ),
-                enabled: false,  // Tắt khả năng chỉnh sửa
+                enabled: false, // Tắt khả năng chỉnh sửa
               ),
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: _saveProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF2C1B05),
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: const Text(
                   'Lưu thay đổi',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18),
+                  style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
             ],
