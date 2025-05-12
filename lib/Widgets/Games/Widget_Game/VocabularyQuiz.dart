@@ -1,37 +1,38 @@
 import 'package:app/helpers/QuizManager.dart';
 import 'package:flutter/material.dart';
+import 'package:app/Database/mongoDB.dart';
 
 class VocabularyQuiz extends StatefulWidget {
   @override
-  // ignore: library_private_types_in_public_api
   _VocabularyQuizState createState() => _VocabularyQuizState();
 }
 
 class _VocabularyQuizState extends State<VocabularyQuiz> {
   late QuizManager quizManager;
 
-  final List<Map<String, dynamic>> questions = [
-    {
-      "question": "She ___ going to the market.",
-      "options": ["is", "are", "was", "were"],
-      "answer": "is"
-    },
-    {
-      "question": "They ___ playing soccer.",
-      "options": ["is", "are", "was", "were"],
-      "answer": "are"
-    },
-    {
-      "question": "I ___ very happy yesterday.",
-      "options": ["am", "is", "was", "are"],
-      "answer": "was"
-    },
-  ];
+  List<Map<String, dynamic>> questions = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     quizManager = QuizManager(context: context, questions: questions);
+    fetchQuiz();
+  }
+
+  Future<void> fetchQuiz() async {
+    try {
+      final data = await MongoDBDatabase.getQuizData('questions');
+      setState(() {
+        questions = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override

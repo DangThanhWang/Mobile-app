@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/Database/mongoDB.dart';
 
 class SpellingQuiz extends StatefulWidget {
   @override
@@ -6,10 +7,30 @@ class SpellingQuiz extends StatefulWidget {
 }
 
 class _SpellingQuizState extends State<SpellingQuiz> {
-  final List<Map<String, dynamic>> questions = [
-    {"hint": "___ is the capital of Vietnam.", "answer": "Hanoi"},
-    {"hint": "He is a good ___ player.", "answer": "football"},
-  ];
+  List<Map<String, dynamic>> questions = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchQuiz();
+  }
+
+  Future<void> fetchQuiz() async {
+    try {
+      final data = await MongoDBDatabase.getQuizData('spelling');
+      setState(() {
+        questions = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
 
   int currentQuestionIndex = 0;
   TextEditingController answerController = TextEditingController();

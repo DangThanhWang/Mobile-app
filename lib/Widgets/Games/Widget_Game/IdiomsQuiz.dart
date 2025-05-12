@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/Database/mongoDB.dart';
 
 class IdiomsQuiz extends StatefulWidget {
   @override
@@ -6,18 +7,29 @@ class IdiomsQuiz extends StatefulWidget {
 }
 
 class _IdiomsQuizState extends State<IdiomsQuiz> {
-  final List<Map<String, dynamic>> idioms = [
-    {
-      "question": "Break the ice",
-      "options": ["Start a conversation", "Break something", "Feel cold"],
-      "answer": "Start a conversation"
-    },
-    {
-      "question": "Piece of cake",
-      "options": ["Something easy", "A part of a cake", "Hard task"],
-      "answer": "Something easy"
-    },
-  ];
+  List<Map<String, dynamic>> idioms = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchQuiz();
+  }
+
+  Future<void> fetchQuiz() async {
+    try {
+      final data = await MongoDBDatabase.getQuizData('idioms');
+      setState(() {
+        idioms = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   int currentIndex = 0;
   bool hasAnswered = false;
