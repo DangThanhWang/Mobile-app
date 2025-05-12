@@ -2,6 +2,8 @@ import 'package:app/Database/mongoDB.dart';
 import 'package:app/Definitons/Constants.dart';
 import 'package:app/Pages/Auth/GetStarted.dart';
 import 'package:app/Pages/Page/MainHome.dart';
+import 'package:app/Pages/DocumentScanner/document_scanner_page.dart';
+
 import 'package:app/Widgets/ChatBox/AllChatsScreen.dart';
 import 'package:app/Widgets/ChatBox/CreateRoomScreen.dart';
 import 'package:app/Widgets/ChatBox/HelpCenter.dart';
@@ -47,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/all-chats': (context) => AllChatsScreen(),
         '/new-chat': (context) => CreateRoomScreen(),
         '/help': (context) => HelpScreen(),
+        '/document-scanner': (context) => DocumentScannerPage(), // Thêm route mới
       },
       debugShowCheckedModeBanner: false,
     );
