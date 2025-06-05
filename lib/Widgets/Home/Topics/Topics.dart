@@ -34,7 +34,30 @@ class _Topic extends State<Topic> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HomeTopButton(topic: widget.topic),
+      appBar: AppBar(
+        backgroundColor: Colors.brown.shade800,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Text(
+          widget.topic,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
+        toolbarHeight: 60, // Tăng chiều cao của header
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: CustomScrollView(
@@ -53,11 +76,7 @@ class _Topic extends State<Topic> {
                     _buildTestButton(
                       "Kiểm tra nghĩa",
                       Icons.translate,
-                      LinearGradient(
-                        colors: [Colors.brown.shade800, Colors.brown.shade600],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      const Color(0xF98C725E),
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -72,11 +91,7 @@ class _Topic extends State<Topic> {
                     _buildTestButton(
                       "Kiểm tra từ",
                       Icons.spellcheck,
-                      LinearGradient(
-                        colors: [Colors.brown.shade700, Colors.brown.shade600],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
+                      const Color(0xF98C725E),
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -98,13 +113,13 @@ class _Topic extends State<Topic> {
 }
 
 Widget _buildTestButton(
-    String title, IconData icon, Gradient gradient, VoidCallback onTap) {
+    String title, IconData icon, Color color, VoidCallback onTap) {
   return GestureDetector(
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        gradient: gradient,
+        color: color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

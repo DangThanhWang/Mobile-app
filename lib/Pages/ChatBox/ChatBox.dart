@@ -254,7 +254,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color(0xFF7C72E5),
+        backgroundColor: const Color(0xF98C725E),
         title: Row(
           children: [
             const CircleAvatar(
@@ -346,13 +346,13 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF7C72E5).withOpacity(0.1),
+              color: const Color(0xF98C725E).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.chat_bubble_outline,
               size: 60,
-              color: const Color(0xFF7C72E5).withOpacity(0.7),
+              color: const Color(0xF98C725E).withOpacity(0.7),
             ),
           ),
           const SizedBox(height: 20),
@@ -361,7 +361,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF7C72E5),
+              color: Color(0xF98C725E),
             ),
           ),
           const SizedBox(height: 10),
@@ -372,7 +372,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: Color.fromARGB(255, 70, 69, 69),
               ),
             ),
           ),
@@ -421,7 +421,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
                       width: 8,
                       height: 8 + (value + 1) * 4,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF7C72E5)
+                        color: const Color(0xF98C725E)
                             .withOpacity(0.6 + (value + 1) * 0.2),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -466,16 +466,16 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7C72E5).withOpacity(0.1),
+                  color: const Color(0xF98C725E).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFF7C72E5).withOpacity(0.3),
+                    color: const Color(0xF98C725E).withOpacity(0.3),
                   ),
                 ),
                 child: Text(
                   suggestions[index],
                   style: const TextStyle(
-                    color: Color(0xFF7C72E5),
+                    color: Color(0xF98C725E),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -504,7 +504,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
         children: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            color: const Color(0xFF7C72E5),
+            color: const Color(0xF98C725E),
             onPressed: () {
               // Show attachment options
               showModalBottomSheet(
@@ -555,12 +555,12 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
                       ? const Icon(
                           Icons.send_rounded,
                           key: ValueKey('send'),
-                          color: Color(0xFF7C72E5),
+                          color: Color(0xF98C725E),
                         )
                       : const Icon(
                           Icons.mic_rounded,
                           key: ValueKey('mic'),
-                          color: Color(0xFF7C72E5),
+                          color: Color(0xF98C725E),
                         ),
                 ),
                 onPressed: _isComposing
@@ -614,8 +614,10 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
           const SizedBox(height: 20),
           ...options.map((option) {
             return ListTile(
-              leading: Icon(option['icon'] as IconData,
-                  color: const Color(0xFF7C72E5)),
+              leading: Icon(
+                option['icon'] as IconData,
+                color: const Color(0xF98C725E),
+              ),
               title: Text(option['title'] as String),
               onTap: () {
                 Navigator.pop(context); // Đóng options sheet
@@ -793,7 +795,7 @@ class ChatMessage extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isUser ? const Color(0xFF7C72E5) : Colors.white,
+                  color: isUser ? const Color(0xF98C725E) : Colors.white,
                   borderRadius: BorderRadius.circular(20).copyWith(
                     bottomLeft: isUser
                         ? const Radius.circular(20)
