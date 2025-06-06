@@ -37,7 +37,7 @@ class _TestPageState extends State<TestPage> {
     correctDefinition = widget.words[questionIndex]['definition']!;
 
     List<String> allDefinitions =
-    widget.words.map((item) => item['definition']!).toList();
+        widget.words.map((item) => item['definition']!).toList();
     allDefinitions.remove(correctDefinition);
     allDefinitions.shuffle(_random);
 
@@ -118,7 +118,30 @@ class _TestPageState extends State<TestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6EFE5),
-      appBar: HomeTopButton(topic: widget.topic),
+      appBar: AppBar(
+        backgroundColor: Colors.brown.shade800,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Text(
+          widget.topic,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
+        toolbarHeight: 60, // Tăng chiều cao của header
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -184,10 +207,10 @@ class _TestPageState extends State<TestPage> {
                         gradient: LinearGradient(
                           colors: isAnswered
                               ? (isCorrect
-                              ? [Colors.greenAccent, Colors.green]
-                              : (selectedOption == option
-                              ? [Colors.redAccent, Colors.red]
-                              : [Colors.grey.shade200, Colors.white]))
+                                  ? [Colors.greenAccent, Colors.green]
+                                  : (selectedOption == option
+                                      ? [Colors.redAccent, Colors.red]
+                                      : [Colors.grey.shade200, Colors.white]))
                               : [Colors.orangeAccent, Colors.orange],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -240,6 +263,3 @@ class _TestPageState extends State<TestPage> {
     );
   }
 }
-
-
-

@@ -138,14 +138,37 @@ class _GuessthedefinitonState extends State<Guessthedefiniton> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HomeTopButton(topic: widget.topic),
+      appBar: AppBar(
+        backgroundColor: Colors.brown.shade800,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Text(
+          widget.topic,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
+        toolbarHeight: 60, // Tăng chiều cao của header
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/capybara_background.png'),
             fit: BoxFit.cover,
-            colorFilter:
-            ColorFilter.mode(Colors.white.withOpacity(0.9), BlendMode.dstATop),
+            colorFilter: ColorFilter.mode(
+                Colors.white.withOpacity(0.9), BlendMode.dstATop),
           ),
         ),
         child: Padding(
@@ -233,10 +256,12 @@ class _GuessthedefinitonState extends State<Guessthedefiniton> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildThemedButton(
-                    onPressed: _controller.text.isNotEmpty ? _checkAnswer : null,
+                    onPressed:
+                        _controller.text.isNotEmpty ? _checkAnswer : null,
                     icon: Icons.check,
                     label: "Kiểm tra",
-                    backgroundColor: const Color(0xFF2A5934), // Deep Forest Green
+                    backgroundColor:
+                        const Color(0xFF2A5934), // Deep Forest Green
                     textColor: Colors.white,
                   ),
                   _buildThemedButton(
@@ -333,6 +358,3 @@ class _GuessthedefinitonState extends State<Guessthedefiniton> {
     );
   }
 }
-
-
-
