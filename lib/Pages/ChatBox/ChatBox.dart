@@ -3,7 +3,7 @@ import 'package:app/Widgets/ChatBox/RoomChatBox.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:app/Services/ChatBotApiService.dart';
 import 'package:app/Definitons/global.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide Center, State;
 
@@ -23,7 +23,6 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
   late AnimationController _typingIndicatorController;
   bool _isComposing = false;
   bool _showTypingIndicator = false;
-  final Gemini gemini = Gemini.instance;
   final roomService = RoomService();
 
   Future<void> _loadMessages() async {
@@ -163,11 +162,11 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
       // Show temporary processing message
       _addBotMessage("Đang xử lý...");
 
-      // Use Gemini to get response
+      // Use custom ChatBot API instead of Gemini
       print("User ID: $globalUserId");
-      gemini.text(text, modelName: 'models/gemini-1.5-flash').then((value) {
-        print("Nhận được phản hồi từ Gemini");
-        if (value != null && value.content != null) {
+      ChatBotApiService.sendMessage(text, globalUserId ?? 'anonymous').then((response) {
+        print("Nhận được phản hồi từ ChatBot API");
+        if (response != null && response['status'] == 'success') {
           // Remove temporary processing message
           setState(() {
             if (_messages.isNotEmpty && _messages[0].text == "Đang xử lý...") {
@@ -176,8 +175,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
           });
 
           // Get bot response text
-          final botResponse =
-              value.content?.parts?.first.text ?? 'Không có phản hồi';
+          final botResponse = response['response'] ?? 'Không có phản hồi';
 
           // Add bot message to UI
           final ChatMessage message = ChatMessage(
@@ -203,20 +201,18 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
               _addBotMessage("Không nhận được phản hồi từ trợ lý");
 
               // Save error message to database
-              _saveMessageToDatabase(
-                  "bot", "Không nhận được phản hồi từ trợ lý");
+              _saveMessageToDatabase("bot", "Không nhận được phản hồi từ trợ lý");
             }
           });
         }
       }).catchError((error) {
-        print('Lỗi Gemini: $error');
+        print('Lỗi ChatBot API: $error');
         setState(() {
           if (_messages.isNotEmpty && _messages[0].text == "Đang xử lý...") {
             _messages.removeAt(0);
           }
 
-          final errorMessage =
-              "Xin lỗi, đã xảy ra lỗi khi kết nối đến dịch vụ. Chi tiết: ${error.toString()}";
+          final errorMessage = "Xin lỗi, đã xảy ra lỗi khi kết nối đến dịch vụ.";
           _addBotMessage(errorMessage);
 
           // Save error message to database
@@ -315,18 +311,18 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
               child: _messages.isEmpty
                   ? _buildEmptyChat()
                   : ListView.builder(
-                      reverse: true,
-                      itemCount:
-                          _messages.length + (_showTypingIndicator ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (_showTypingIndicator && index == 0) {
-                          return _buildTypingIndicator();
-                        }
-                        final adjustedIndex =
-                            _showTypingIndicator ? index - 1 : index;
-                        return _messages[adjustedIndex];
-                      },
-                    ),
+                reverse: true,
+                itemCount:
+                _messages.length + (_showTypingIndicator ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (_showTypingIndicator && index == 0) {
+                    return _buildTypingIndicator();
+                  }
+                  final adjustedIndex =
+                  _showTypingIndicator ? index - 1 : index;
+                  return _messages[adjustedIndex];
+                },
+              ),
             ),
           ),
           // Typing suggestions
@@ -409,7 +405,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
             child: Row(
               children: List.generate(
                 3,
-                (index) => AnimatedBuilder(
+                    (index) => AnimatedBuilder(
                   animation: _typingIndicatorController,
                   builder: (context, child) {
                     final double value = math.sin(
@@ -464,7 +460,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(18),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF7C72E5).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(18),
@@ -553,28 +549,28 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
                   },
                   child: _isComposing
                       ? const Icon(
-                          Icons.send_rounded,
-                          key: ValueKey('send'),
-                          color: Color(0xFF7C72E5),
-                        )
+                    Icons.send_rounded,
+                    key: ValueKey('send'),
+                    color: Color(0xFF7C72E5),
+                  )
                       : const Icon(
-                          Icons.mic_rounded,
-                          key: ValueKey('mic'),
-                          color: Color(0xFF7C72E5),
-                        ),
+                    Icons.mic_rounded,
+                    key: ValueKey('mic'),
+                    color: Color(0xFF7C72E5),
+                  ),
                 ),
                 onPressed: _isComposing
                     ? () => _handleSubmitted(_textController.text)
                     : () {
-                        // Handle voice input
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text('Tính năng ghi âm đang được phát triển'),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      },
+                  // Handle voice input
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                      Text('Tính năng ghi âm đang được phát triển'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
               );
             },
           ),
@@ -773,13 +769,13 @@ class ChatMessage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
         child: Row(
           mainAxisAlignment:
-              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+          isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (!isUser) ...[
               CircleAvatar(
                 backgroundImage:
-                    const AssetImage('assets/images/avar_chatbox.jpg'),
+                const AssetImage('assets/images/avar_chatbox.jpg'),
                 backgroundColor: Colors.grey[200],
                 radius: 16,
               ),
@@ -791,7 +787,7 @@ class ChatMessage extends StatelessWidget {
                   maxWidth: MediaQuery.of(context).size.width * 0.7,
                 ),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isUser ? const Color(0xFF7C72E5) : Colors.white,
                   borderRadius: BorderRadius.circular(20).copyWith(
@@ -822,7 +818,7 @@ class ChatMessage extends StatelessWidget {
               const SizedBox(width: 8),
               CircleAvatar(
                 backgroundImage:
-                    const AssetImage('assets/images/avatar_default.jpeg'),
+                const AssetImage('assets/images/avatar_default.jpeg'),
                 backgroundColor: Colors.grey[200],
                 radius: 16,
               ),
