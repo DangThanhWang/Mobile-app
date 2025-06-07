@@ -17,14 +17,53 @@ double animatedPositionedLEftValue(int currentIndex) {
   }
 }
 
-// ignore: constant_identifier_names
+// ============================================================================
+// API CONFIGURATIONS
+// ============================================================================
+
+// Google API Key (kept for other services if needed)
 const API_KEY = 'AIzaSyDoD2FNKWnr6xtGGJwNCCQ6tmjtHqua8JE';
 
-// ignore: constant_identifier_names
+// Qwen Model Configuration
+// 🔧 QUAN TRỌNG: Thay đổi URL này thành URL Gradio của bạn
+const QWEN_MODEL_URL = 'https://25f65b1c3ee36b41bc.gradio.live';
+
+// Ví dụ URLs:
+// const QWEN_MODEL_URL = 'https://abc123def456.gradio.live';
+// const QWEN_MODEL_URL = 'https://1234567890abcdef.gradio.live';
+
+// Timeout settings cho Qwen API
+const QWEN_TIMEOUT_SECONDS = 30;
+
+// Model fallback settings
+const ENABLE_FALLBACK_TO_GEMINI = false; // Set true nếu muốn fallback về Gemini khi Qwen fail
+
+// ============================================================================
+// DATABASE CONFIGURATIONS
+// ============================================================================
+
+// MongoDB Configuration
 const MONGO_URL =
     'mongodb+srv://dinhductai2004:Tai03102004@englishapp.3ryiky2.mongodb.net/EnglishApp?retryWrites=true&w=majority&appName=EnglishApp';
 
-// ignore: constant_identifier_names
+// Collection names
 const COLLECTION_Users = 'Users';
-// ignore: constant_identifier_names
 const COLLECTION_Rooms = 'Rooms';
+
+// ============================================================================
+// MODEL INFORMATION
+// ============================================================================
+
+// Model metadata for UI display
+const MODEL_INFO = {
+  'name': 'Qwen2-1.5B Fine-tuned',
+  'version': '1.0',
+  'platform': 'Google Colab GPU T4',
+  'languages': ['Tiếng Việt', 'English'],
+  'specialization': 'Học tiếng Anh',
+  'response_time': '2-5 giây',
+  'author': 'Custom Fine-tuned',
+};
+
+// Debug settings
+const DEBUG_QWEN_API = true; // Set false trong production

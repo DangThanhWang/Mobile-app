@@ -12,7 +12,173 @@ import 'package:app/Widgets/Dictionary/Dictionary.dart';
 import 'package:flutter/material.dart';
 
 import '../../Widgets/Dictionary/FloatingDictionaryButton.dart';
-import '../../Widgets/ChatBox/ChatboxButton.dart';
+
+// Tạo ChatBotPage như một widget riêng
+class ChatBotPage extends StatefulWidget {
+  const ChatBotPage({super.key});
+
+  @override
+  State<ChatBotPage> createState() => _ChatBotPageState();
+}
+
+class _ChatBotPageState extends State<ChatBotPage> {
+  String? roomId;
+  bool isLoading = true;
+  String? error;
+  final roomService = RoomService();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeChatRoom();
+  }
+
+  Future<void> _initializeChatRoom() async {
+    try {
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+
+      final userId = globalUserId;
+      if (userId == null) {
+        setState(() {
+          error = 'Vui lòng đăng nhập để sử dụng chatbot';
+          isLoading = false;
+        });
+        return;
+      }
+
+      // Tạo room mới hoặc sử dụng room hiện tại
+      String newRoomId;
+      if (globalRooms != null) {
+        newRoomId = globalRooms!;
+      } else {
+        newRoomId = await roomService.createRoom(userId, 'Cuộc trò chuyện với AI');
+        globalRooms = newRoomId;
+      }
+
+      setState(() {
+        roomId = newRoomId;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = 'Không thể tạo cuộc trò chuyện: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _createNewChat() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final userId = globalUserId;
+      if (userId == null) return;
+
+      final newRoomId = await roomService.createRoom(userId, 'Cuộc trò chuyện mới với AI');
+      globalRooms = newRoomId;
+
+      setState(() {
+        roomId = newRoomId;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = 'Không thể tạo cuộc trò chuyện mới: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Chatbot AI'),
+          backgroundColor: const Color(0xFF7C72E5),
+          automaticallyImplyLeading: false,
+        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Color(0xFF7C72E5),
+              ),
+              SizedBox(height: 16),
+              Text('Đang khởi tạo cuộc trò chuyện...'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (error != null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Chatbot AI'),
+          backgroundColor: const Color(0xFF7C72E5),
+          automaticallyImplyLeading: false,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _initializeChatRoom,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7C72E5),
+                ),
+                child: const Text(
+                  'Thử lại',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (roomId == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Chatbot AI'),
+          backgroundColor: const Color(0xFF7C72E5),
+          automaticallyImplyLeading: false,
+        ),
+        body: const Center(
+          child: Text('Đã xảy ra lỗi không xác định'),
+        ),
+      );
+    }
+
+    // Sử dụng ChatBox với wrapper AppBar
+    return Scaffold(
+      body: ChatBox(
+        roomId: roomId!,
+        roomName: 'Chatbot AI',
+      ),
+    );
+  }
+}
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -24,17 +190,10 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late final PageController _pageController;
   int _pageIndex = 0;
-  final roomService = RoomService();
 
-  String? roomId = globalRooms;
-
-  // Variables for tracking dictionary button position
+  // Variables for tracking dictionary button position only
   double _dictionaryXPosition = 40.0;
   double _dictionaryYPosition = 480.0;
-
-  // Variables for tracking chatbox button position
-  double _chatboxXPosition = 500.0;
-  double _chatboxYPosition = 480.0;
 
   @override
   void initState() {
@@ -52,7 +211,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     AppSizes().init(context);
 
-    // Ensure the buttons stay within screen bounds
+    // Ensure the dictionary button stays within screen bounds
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -68,15 +227,15 @@ class _MainPageState extends State<MainPage> {
               });
             },
             children: [
-              const HomePage(),
-              Pronunciation_Topic(),
-              const NewsPage(),
-              const RankingPage(),
-              const UserProfilePage(),
+              const HomePage(),                // Index 0: Home
+              Pronunciation_Topic(),           // Index 1: Pronunciation
+              const NewsPage(),               // Index 2: News
+              const ChatBotPage(),            // Index 3: Chatbot AI
+              const UserProfilePage(),        // Index 4: Profile
             ],
           ),
 
-          // Draggable Floating Dictionary Button
+          // Chỉ giữ lại Floating Dictionary Button
           Positioned(
             left: _dictionaryXPosition.clamp(
                 0.0, screenWidth - 80), // Keep within horizontal bounds
@@ -103,68 +262,6 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
-
-          // Draggable Floating ChatBox Button
-          Positioned(
-            left: _chatboxXPosition.clamp(
-                0.0, screenWidth - 100), // Keep within horizontal bounds
-            top: _chatboxYPosition.clamp(
-                0.0, screenHeight - 160), // Keep within vertical bounds
-            child: GestureDetector(
-              onPanUpdate: (details) {
-                setState(() {
-                  _chatboxXPosition += details.delta.dx;
-                  _chatboxYPosition += details.delta.dy;
-                });
-              },
-              onTap: () async {
-                final userId = globalUserId; // lấy từ Auth hoặc Provider
-                final roomService = RoomService();
-                try {
-                  final roomId =
-                      await roomService.createRoom(userId!, 'New Room');
-                  globalRooms = roomId;
-                  // ignore: use_build_context_synchronously
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      // ignore: void_checks
-                      builder: (context) => ChatBox(
-                        roomId: roomId,
-                        roomName: 'New Room',
-                      ),
-                    ),
-                  );
-                } catch (e) {
-                  print("Lỗi tạo phòng: $e");
-                  // Hiển thị thông báo lỗi nếu cần
-                }
-              },
-              child: ChatBoxButton(
-                onTap: () async {
-                  final userId = globalUserId; // lấy từ Auth hoặc Provider
-                  final roomService = RoomService();
-                  try {
-                    final roomId =
-                        await roomService.createRoom(userId!, 'New Room');
-                    globalRooms = roomId;
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        // ignore: void_checks
-                        builder: (context) => ChatBox(
-                          roomId: roomId,
-                          roomName: 'New Room',
-                        ),
-                      ),
-                    );
-                  } catch (e) {
-                    print("Lỗi tạo phòng: $e");
-                    // Hiển thị thông báo lỗi nếu cần
-                  }
-                },
-              ),
-            ),
-          ),
         ],
       ),
       bottomNavigationBar: Padding(
@@ -173,6 +270,7 @@ class _MainPageState extends State<MainPage> {
           currentIndex: _pageIndex,
           pageController: _pageController,
           onTap: (value) {
+            // Tất cả các tab hoạt động bình thường với PageView
             _pageController.jumpToPage(value);
           },
         ),
