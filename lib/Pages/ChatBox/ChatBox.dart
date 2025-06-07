@@ -525,7 +525,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
 
   Widget _buildSuggestionChips() {
     final suggestions = [
-      "Từ vựng chủ đề du lịch",
+      "Giúp tôi học tiếng Anh",
       "Cách sử dụng thì hiện tại đơn",
       "Giúp tôi luyện phát âm",
       "Bài tập ngữ pháp",
