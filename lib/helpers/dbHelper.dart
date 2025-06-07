@@ -20,7 +20,7 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     // Get the path to the app's documents directory
     var databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'Words.sqlite');
+    String path = join(databasesPath, 'triopybara.sqlite');
 
     // Check if the database exists
     var exists = await databaseExists(path);
@@ -30,8 +30,10 @@ class DatabaseHelper {
       print('Copying database from assets...');
 
       // Load the asset's database file
-      ByteData data = await rootBundle.load(join('lib/sources', 'Words.sqlite'));
-      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      ByteData data =
+          await rootBundle.load(join('lib/sources', 'triopybara.sqlite'));
+      List<int> bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
       // Write the data to the local path
       await File(path).writeAsBytes(bytes, flush: true);
@@ -44,7 +46,8 @@ class DatabaseHelper {
   // Function to get around 30 random words from the 'bookmark' table
   Future<List<Map<String, dynamic>>> getRandomWords(int limit) async {
     final db = await database;
-    return await db.rawQuery('SELECT * FROM bookmark ORDER BY RANDOM() LIMIT ?', [limit]);
+    return await db.rawQuery(
+        'SELECT * FROM dictionary ORDER BY RANDOM() LIMIT ?', [limit]);
   }
 
   Future<List<Map<String, String>>> loadWords(String topic) async {
@@ -53,7 +56,7 @@ class DatabaseHelper {
     try {
       // Access the file from assets
       final String fileContent =
-      await rootBundle.loadString('assets/data/$topic.txt');
+          await rootBundle.loadString('assets/data/$topic.txt');
       //await rootBundle.loadString('assets/data/demo.txt');
       List<String> lines = fileContent.split('\n');
 
@@ -61,7 +64,8 @@ class DatabaseHelper {
         // Assume each line has the format: word:meaning
         List<String> parts = line.split(':');
         if (parts.length == 2) {
-          wordList.add({'word': parts[0].trim(), 'definition': parts[1].trim()});
+          wordList
+              .add({'target': parts[0].trim(), 'definition': parts[1].trim()});
         }
       }
     } catch (e) {

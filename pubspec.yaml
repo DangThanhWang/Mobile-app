@@ -50,7 +50,9 @@ dependencies:
   flutter_gemini: ^2.0.5
   google_generative_ai: ^0.4.7
   mongo_dart: ^0.10.3
-  mysql1: ^0.20.0
+  mysql1: ^0.19.2
+  http: ^1.4.0
+  flutter_html: ^3.0.0-beta.2
 
 dev_dependencies:
   flutter_test:
