@@ -21,6 +21,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   late AnimationController _sendButtonController;
   late AnimationController _typingIndicatorController;
+  late AnimationController _fadeController;
   bool _isComposing = false;
   bool _showTypingIndicator = false;
   final roomService = RoomService();
@@ -73,9 +74,13 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
       if (e.toString().contains("Phòng đã đầy")) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Phòng đã đầy. Hãy tạo phòng mới.'),
+          SnackBar(
+            content: const Text('Phòng đã đầy. Hãy tạo phòng mới.'),
             behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red.shade600,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -105,6 +110,11 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..repeat();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeController.forward();
     print(widget.roomId);
 
     // Add initial welcome message and save to database
@@ -122,6 +132,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
     _focusNode.dispose();
     _sendButtonController.dispose();
     _typingIndicatorController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
@@ -250,12 +261,31 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color(0xFF7C72E5),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF7C72E5), Color(0xFF5C52DB)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         title: Row(
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/avar_chatbox.jpg'),
-              backgroundColor: Colors.white,
+            Hero(
+              tag: 'chatAvatar',
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+                ),
+                child: const CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/avar_chatbox.jpg'),
+                  backgroundColor: Colors.white,
+                  radius: 18,
+                ),
+              ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -266,14 +296,36 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                const Text(
-                  'Đang hoạt động',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.greenAccent,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.greenAccent.withOpacity(0.5),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Đang hoạt động',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             )
@@ -281,7 +333,14 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.more_vert, color: Colors.white),
+            ),
             onPressed: () {
               // Show options menu
               showModalBottomSheet(
@@ -295,41 +354,52 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Chat history
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/chat_background.jpg'),
-                  opacity: 0.05,
-                  fit: BoxFit.contain,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.grey[50]!, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Column(
+          children: [
+            // Chat history
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: const AssetImage('assets/images/chat_background.jpg'),
+                    opacity: 0.03,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: _messages.isEmpty
+                    ? FadeTransition(
+                  opacity: _fadeController,
+                  child: _buildEmptyChat(),
+                )
+                    : ListView.builder(
+                  reverse: true,
+                  itemCount:
+                  _messages.length + (_showTypingIndicator ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (_showTypingIndicator && index == 0) {
+                      return _buildTypingIndicator();
+                    }
+                    final adjustedIndex =
+                    _showTypingIndicator ? index - 1 : index;
+                    return _messages[adjustedIndex];
+                  },
                 ),
               ),
-              child: _messages.isEmpty
-                  ? _buildEmptyChat()
-                  : ListView.builder(
-                reverse: true,
-                itemCount:
-                _messages.length + (_showTypingIndicator ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (_showTypingIndicator && index == 0) {
-                    return _buildTypingIndicator();
-                  }
-                  final adjustedIndex =
-                  _showTypingIndicator ? index - 1 : index;
-                  return _messages[adjustedIndex];
-                },
-              ),
             ),
-          ),
-          // Typing suggestions
-          _buildSuggestionChips(),
-          // Input area
-          _buildInputArea(),
-        ],
+            // Typing suggestions
+            _buildSuggestionChips(),
+            // Input area
+            _buildInputArea(),
+          ],
+        ),
       ),
     );
   }
@@ -340,13 +410,27 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
-              color: const Color(0xFF7C72E5).withOpacity(0.1),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF7C72E5).withOpacity(0.1),
+                  const Color(0xFF5C52DB).withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF7C72E5).withOpacity(0.1),
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                ),
+              ],
             ),
             child: Icon(
-              Icons.chat_bubble_outline,
+              Icons.chat_bubble_outline_rounded,
               size: 60,
               color: const Color(0xFF7C72E5).withOpacity(0.7),
             ),
@@ -355,7 +439,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
           const Text(
             'Bắt đầu cuộc trò chuyện',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF7C72E5),
             ),
@@ -367,8 +451,9 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
               'Hãy đặt câu hỏi hoặc chọn một gợi ý bên dưới để bắt đầu',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 15,
                 color: Colors.grey,
+                height: 1.5,
               ),
             ),
           ),
@@ -397,7 +482,7 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
+                  blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -417,8 +502,14 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
                       width: 8,
                       height: 8 + (value + 1) * 4,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF7C72E5)
-                            .withOpacity(0.6 + (value + 1) * 0.2),
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF7C72E5),
+                            const Color(0xFF5C52DB),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     );
@@ -448,6 +539,13 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
         border: Border(
           top: BorderSide(color: Colors.grey.shade200),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 5,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -455,24 +553,35 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: InkWell(
-              onTap: () => _handleSubmitted(suggestions[index]),
-              borderRadius: BorderRadius.circular(18),
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7C72E5).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: const Color(0xFF7C72E5).withOpacity(0.3),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _handleSubmitted(suggestions[index]),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF7C72E5).withOpacity(0.1),
+                        const Color(0xFF5C52DB).withOpacity(0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: const Color(0xFF7C72E5).withOpacity(0.3),
+                    ),
                   ),
-                ),
-                child: Text(
-                  suggestions[index],
-                  style: const TextStyle(
-                    color: Color(0xFF7C72E5),
-                    fontWeight: FontWeight.w500,
+                  child: Text(
+                    suggestions[index],
+                    style: const TextStyle(
+                      color: Color(0xFF7C72E5),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),
@@ -496,85 +605,126 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            color: const Color(0xFF7C72E5),
-            onPressed: () {
-              // Show attachment options
-              showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (context) => _buildAttachmentSheet(),
-              );
-            },
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
+      child: SafeArea(
+        child: Row(
+          children: [
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
                 borderRadius: BorderRadius.circular(24),
-              ),
-              child: TextField(
-                controller: _textController,
-                focusNode: _focusNode,
-                decoration: const InputDecoration(
-                  hintText: 'Nhập tin nhắn...',
-                  border: InputBorder.none,
-                ),
-                onChanged: (text) {
-                  setState(() {
-                    _isComposing = text.isNotEmpty;
-                  });
-                },
-                onSubmitted: _isComposing ? _handleSubmitted : null,
-              ),
-            ),
-          ),
-          AnimatedBuilder(
-            animation: _sendButtonController,
-            builder: (context, child) {
-              return IconButton(
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  transitionBuilder: (child, animation) {
-                    return ScaleTransition(
-                      scale: animation,
-                      child: child,
-                    );
-                  },
-                  child: _isComposing
-                      ? const Icon(
-                    Icons.send_rounded,
-                    key: ValueKey('send'),
-                    color: Color(0xFF7C72E5),
-                  )
-                      : const Icon(
-                    Icons.mic_rounded,
-                    key: ValueKey('mic'),
-                    color: Color(0xFF7C72E5),
-                  ),
-                ),
-                onPressed: _isComposing
-                    ? () => _handleSubmitted(_textController.text)
-                    : () {
-                  // Handle voice input
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content:
-                      Text('Tính năng ghi âm đang được phát triển'),
-                      behavior: SnackBarBehavior.floating,
+                onTap: () {
+                  // Show attachment options
+                  showModalBottomSheet(
+                    context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                     ),
+                    builder: (context) => _buildAttachmentSheet(),
                   );
                 },
-              );
-            },
-          ),
-        ],
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: const Icon(
+                    Icons.add_circle,
+                    color: Color(0xFF7C72E5),
+                    size: 28,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Colors.grey[300]!,
+                    width: 1,
+                  ),
+                ),
+                child: TextField(
+                  controller: _textController,
+                  focusNode: _focusNode,
+                  decoration: const InputDecoration(
+                    hintText: 'Nhập tin nhắn...',
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      _isComposing = text.isNotEmpty;
+                    });
+                  },
+                  onSubmitted: _isComposing ? _handleSubmitted : null,
+                ),
+              ),
+            ),
+            AnimatedBuilder(
+              animation: _sendButtonController,
+              builder: (context, child) {
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: _isComposing
+                        ? () => _handleSubmitted(_textController.text)
+                        : () {
+                      // Handle voice input
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content:
+                          const Text('Tính năng ghi âm đang được phát triển'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: const Color(0xFF7C72E5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        transitionBuilder: (child, animation) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
+                        child: _isComposing
+                            ? Container(
+                          key: const ValueKey('send'),
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF7C72E5), Color(0xFF5C52DB)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.send_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        )
+                            : const Icon(
+                          Icons.mic_rounded,
+                          key: ValueKey('mic'),
+                          color: Color(0xFF7C72E5),
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -584,18 +734,34 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
       {
         'icon': Icons.delete_outline,
         'title': 'Xóa lịch sử trò chuyện',
+        'color': Colors.red,
       },
       {
         'icon': Icons.note_alt_outlined,
         'title': 'Tất cả cuộc trò chuyện',
-        'route': '/all-chats'
+        'route': '/all-chats',
+        'color': Colors.blue,
       },
-      {'icon': Icons.chat, 'title': 'Phòng chat mới', 'route': '/new-chat'},
-      {'icon': Icons.help_outline, 'title': 'Trợ giúp', 'route': '/help'},
+      {
+        'icon': Icons.chat,
+        'title': 'Phòng chat mới',
+        'route': '/new-chat',
+        'color': Colors.green,
+      },
+      {
+        'icon': Icons.help_outline,
+        'title': 'Trợ giúp',
+        'route': '/help',
+        'color': Colors.orange,
+      },
     ];
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -610,15 +776,30 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
           const SizedBox(height: 20),
           ...options.map((option) {
             return ListTile(
-              leading: Icon(option['icon'] as IconData,
-                  color: const Color(0xFF7C72E5)),
-              title: Text(option['title'] as String),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: (option['color'] as Color).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  option['icon'] as IconData,
+                  color: option['color'] as Color,
+                ),
+              ),
+              title: Text(
+                option['title'] as String,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
               onTap: () {
                 Navigator.pop(context); // Đóng options sheet
                 if (option['title'] == 'Xóa lịch sử trò chuyện') {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       title: const Text('Xác nhận'),
                       content: const Text(
                           'Bạn có chắc chắn muốn xoá toàn bộ lịch sử trò chuyện không?'),
@@ -633,8 +814,14 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
                             Navigator.of(context).pop(); // Đóng dialog
                             deleteMessageFromDatabase(widget.roomId);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Đã xoá lịch sử trò chuyện.')),
+                              SnackBar(
+                                content: const Text('Đã xoá lịch sử trò chuyện.'),
+                                backgroundColor: Colors.green.shade600,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
                             );
                           },
                           child: const Text(
@@ -668,6 +855,10 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
 
     return Container(
       padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -699,43 +890,57 @@ class _ChatBoxState extends State<ChatBox> with TickerProviderStateMixin {
             itemCount: attachments.length,
             itemBuilder: (context, index) {
               final attachment = attachments[index];
-              return InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                  // Show snackbar for demo purposes
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Đã chọn: ${attachment['title']}'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: (attachment['color'] as Color).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                    // Show snackbar for demo purposes
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Đã chọn: ${attachment['title']}'),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: const Color(0xFF7C72E5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
-                      child: Icon(
-                        attachment['icon'] as IconData,
-                        color: attachment['color'] as Color,
-                        size: 28,
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              (attachment['color'] as Color).withOpacity(0.2),
+                              (attachment['color'] as Color).withOpacity(0.1),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Icon(
+                          attachment['icon'] as IconData,
+                          color: attachment['color'] as Color,
+                          size: 28,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      attachment['title'] as String,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(height: 8),
+                      Text(
+                        attachment['title'] as String,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
@@ -757,6 +962,65 @@ class ChatMessage extends StatelessWidget {
   final String text;
   final bool isUser;
   final AnimationController animationController;
+
+  // Function to parse text with **bold** formatting
+  List<TextSpan> _parseText(String text) {
+    final List<TextSpan> spans = [];
+    final RegExp boldRegex = RegExp(r'\*\*(.*?)\*\*');
+    int lastEnd = 0;
+
+    for (final match in boldRegex.allMatches(text)) {
+      // Add normal text before the bold text
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(
+          text: text.substring(lastEnd, match.start),
+          style: TextStyle(
+            color: isUser ? Colors.white : Colors.black87,
+            fontSize: 15,
+            height: 1.5,
+          ),
+        ));
+      }
+
+      // Add bold text
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: TextStyle(
+          color: isUser ? Colors.white : Colors.black87,
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+          height: 1.5,
+        ),
+      ));
+
+      lastEnd = match.end;
+    }
+
+    // Add any remaining text
+    if (lastEnd < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastEnd),
+        style: TextStyle(
+          color: isUser ? Colors.white : Colors.black87,
+          fontSize: 15,
+          height: 1.5,
+        ),
+      ));
+    }
+
+    return spans.isEmpty
+        ? [
+      TextSpan(
+        text: text,
+        style: TextStyle(
+          color: isUser ? Colors.white : Colors.black87,
+          fontSize: 15,
+          height: 1.5,
+        ),
+      )
+    ]
+        : spans;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -789,7 +1053,14 @@ class ChatMessage extends StatelessWidget {
                 padding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isUser ? const Color(0xFF7C72E5) : Colors.white,
+                  gradient: isUser
+                      ? const LinearGradient(
+                    colors: [Color(0xFF7C72E5), Color(0xFF5C52DB)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                      : null,
+                  color: isUser ? null : Colors.white,
                   borderRadius: BorderRadius.circular(20).copyWith(
                     bottomLeft: isUser
                         ? const Radius.circular(20)
@@ -800,16 +1071,17 @@ class ChatMessage extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
+                      color: isUser
+                          ? const Color(0xFF7C72E5).withOpacity(0.3)
+                          : Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    color: isUser ? Colors.white : Colors.black87,
+                child: RichText(
+                  text: TextSpan(
+                    children: _parseText(text),
                   ),
                 ),
               ),

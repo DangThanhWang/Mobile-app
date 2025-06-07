@@ -13,9 +13,9 @@ class Menu extends StatefulWidget {
   final PageController pageController;
   const Menu(
       {required this.currentIndex,
-      super.key,
-      required this.onTap,
-      required this.pageController});
+        super.key,
+        required this.onTap,
+        required this.pageController});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -45,7 +45,7 @@ class _Menu extends State<Menu> {
       {'icon': IconlyLight.home, 'index': 0},
       {'icon': HugeIcons.strokeRoundedAiBrain02, 'index': 1},
       {'icon': HugeIcons.strokeRoundedNews, 'index': 2},
-      {'icon': HugeIcons.strokeRoundedChampion, 'index': 3},
+      {'icon': IconlyLight.chat, 'index': 3},
       {'icon': IconlyLight.user, 'index': 4},
     ];
 
