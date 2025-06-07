@@ -120,7 +120,6 @@ class _FlashcardListState extends State<FlashcardList>
   @override
   Widget build(BuildContext context) {
     final words = widget.words;
-    print("Vocab List: $words");
 
     return words.isEmpty
         ? Center(

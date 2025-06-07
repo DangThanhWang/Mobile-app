@@ -1,6 +1,8 @@
 import 'package:app/Widgets/Dictionary/Word.dart';
+import 'package:app/helpers/dbHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class Dictionary extends StatefulWidget {
   const Dictionary({super.key});
@@ -33,6 +35,9 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
+  var dbHelper = DatabaseHelper();
+  List<Map<String, dynamic>> words = [];
+
   @override
   void initState() {
     super.initState();
@@ -57,6 +62,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -69,25 +75,51 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       });
       _fadeController.reset();
 
-      Word? result = await Word.search(query);
-      setState(() {
-        _isLoading = false;
-        _searchResult = result;
-      });
+      try {
+        Word? result = await Word.search(query);
+        setState(() {
+          _isLoading = false;
+          _searchResult = result;
+        });
 
-      if (result != null) {
-        _fadeController.forward();
-        _slideController.forward();
+        if (result != null) {
+          _fadeController.forward();
+          _slideController.forward();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Không tìm thấy từ '$query'"),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Lỗi khi tìm kiếm: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
 
   void _updateSuggestions(String query) async {
     if (query.isNotEmpty) {
-      List<String> suggestions = await Word.Suggestions(query);
-      setState(() {
-        _suggestions = suggestions;
-      });
+      try {
+        List<String> suggestions = await Word.getSuggestions(query);
+        setState(() {
+          _suggestions = suggestions;
+        });
+      } catch (e) {
+        print("❌ Lỗi khi lấy gợi ý: $e");
+        setState(() {
+          _suggestions = [];
+        });
+      }
     } else {
       setState(() {
         _suggestions = [];
@@ -114,7 +146,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             const Icon(Icons.check_circle, color: Colors.white),
             const SizedBox(width: 12),
             Text(
-              "Copied to clipboard!",
+              "Đã sao chép!",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ],
@@ -123,6 +155,181 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  List<Widget> _formatDefinition(String htmlDefinition) {
+    List<Widget> widgets = [];
+
+    if (htmlDefinition.isEmpty) {
+      return [const Text('Không có định nghĩa')];
+    }
+
+    // Bỏ ký tự đặc biệt không mong muốn và các thẻ wrapper
+    String cleanHtml = htmlDefinition
+        .replaceAll('\uFEFF', '')
+        .replaceAll(RegExp(r'^<[IQ]><[QI]>'), '') // Bỏ thẻ mở đầu
+        .replaceAll(RegExp(r'</[QI]></[IQ]>$'), '') // Bỏ thẻ kết thúc
+        .trim();
+
+    // Tách từng dòng theo <br> hoặc <br/>
+    List<String> lines = cleanHtml.split(RegExp(r'<br\s*/?>\s*'));
+
+    for (String line in lines) {
+      String trimmed = line.trim();
+
+      if (trimmed.isEmpty) continue;
+
+      // Phân loại dòng theo ký tự đầu
+      if (trimmed.startsWith('@')) {
+        // Phonetic: @dog /dɔg/
+        widgets.add(_buildPhonetic(trimmed));
+      } else if (trimmed.startsWith('*')) {
+        // Word type: * danh từ, * ngoại động từ
+        widgets.add(_buildWordType(trimmed));
+      } else if (trimmed.startsWith('-')) {
+        // Meaning: - chó, - chó săn
+        widgets.add(_buildMeaning(trimmed));
+      } else if (trimmed.startsWith('=')) {
+        // Example: =a sly dog+ thằng cha vận đỏ
+        widgets.add(_buildExample(trimmed));
+      } else if (trimmed.startsWith('!')) {
+        // Idiom: !to be a dog in the manger
+        widgets.add(_buildIdiom(trimmed));
+      } else {
+        // Default HTML content
+        widgets.add(_buildHtmlDefinition(trimmed));
+      }
+
+      // Thêm khoảng cách giữa các dòng
+      widgets.add(const SizedBox(height: 6));
+    }
+
+    // Bỏ SizedBox cuối cùng nếu có
+    if (widgets.isNotEmpty && widgets.last is SizedBox) {
+      widgets.removeLast();
+    }
+
+    return widgets;
+  }
+
+  Widget _buildPhonetic(String line) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Text(
+        line,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: Colors.indigo,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWordType(String line) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Text(
+        line,
+        style: const TextStyle(
+          fontSize: 15,
+          fontStyle: FontStyle.italic,
+          fontWeight: FontWeight.w600,
+          color: Colors.teal,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMeaning(String line) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "• ",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          Expanded(
+            child: Html(
+              data: line.substring(1).trim(),
+              style: {
+                "body": Style(
+                  fontSize: FontSize(15),
+                  color: const Color(0xFF2D3748),
+                  margin: Margins.zero,
+                  padding: HtmlPaddings.zero,
+                ),
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExample(String line) {
+    // Xử lý format =text+ translation
+    String content = line.substring(1).trim();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 2, bottom: 2),
+      child: Html(
+        data: "<i>$content</i>",
+        style: {
+          "i": Style(
+            color: Colors.grey.shade700,
+            fontSize: FontSize(14),
+          ),
+          "body": Style(
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+          ),
+        },
+      ),
+    );
+  }
+
+  Widget _buildIdiom(String line) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Html(
+        data: "<b>${line.substring(1).trim()}</b>",
+        style: {
+          "b": Style(
+            color: Colors.brown.shade700,
+            fontSize: FontSize(15),
+            fontWeight: FontWeight.bold,
+          ),
+          "body": Style(
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+          ),
+        },
+      ),
+    );
+  }
+
+  Widget _buildHtmlDefinition(String line) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Html(
+        data: line,
+        style: {
+          "body": Style(
+            fontSize: FontSize(15),
+            color: const Color(0xFF4A5568),
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+          ),
+        },
       ),
     );
   }
@@ -332,7 +539,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              "Searching...",
+                              "Đang tìm kiếm...",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey.shade600,
@@ -400,35 +607,57 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                                 ),
                                 const SizedBox(height: 20),
 
-                                // Definition Section
-                                _buildSection(
-                                  "Definition",
-                                  _searchResult!.definition,
-                                  Icons.book_outlined,
-                                  const Color(0xFF3182CE),
+                                // Definition Section with Enhanced Formatting
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade50.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color:
+                                          Colors.blue.shade200.withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade100,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Icon(
+                                              Icons.book_outlined,
+                                              color: Colors.blue.shade700,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            "Định nghĩa",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue.shade700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: _formatDefinition(
+                                            _searchResult!.definition),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-
-                                // Example Section
-                                if (_searchResult!.example.isNotEmpty) ...[
-                                  const SizedBox(height: 20),
-                                  _buildSection(
-                                    "Example",
-                                    _searchResult!.example,
-                                    Icons.lightbulb_outline,
-                                    const Color(0xFFD69E2E),
-                                  ),
-                                ],
-
-                                // Synonyms Section
-                                if (_searchResult!.synonyms.isNotEmpty) ...[
-                                  const SizedBox(height: 20),
-                                  _buildSection(
-                                    "Synonyms",
-                                    _searchResult!.synonyms,
-                                    Icons.swap_horiz,
-                                    const Color(0xFF38A169),
-                                  ),
-                                ],
                               ],
                             ),
                           ),
@@ -485,53 +714,6 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                     ),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSection(
-      String title, String content, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            content,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color(0xFF4A5568),
-              height: 1.5,
             ),
           ),
         ],

@@ -3,14 +3,14 @@ import 'package:app/Widgets/News/new_list_item.dart';
 import 'package:flutter/material.dart';
 
 class ViewAllStoriesPage extends StatelessWidget {
-  const ViewAllStoriesPage({Key? key}) : super(key: key);
+  const ViewAllStoriesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Xem tất cả truyện"),
-        backgroundColor: Color(0xFF7C72E5),
+        backgroundColor: Color(0xF98C725E),
       ),
       body: CustomScrollView(
         slivers: [
