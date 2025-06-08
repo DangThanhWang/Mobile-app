@@ -81,7 +81,7 @@ class _PronunciationPracticePageState extends State<PronunciationPracticePage>
   void _startListening() async {
     await _speechToText.listen(
       onResult: _onSpeechResult,
-      localeId: "vi-VN", // Sử dụng tiếng Việt cho nhận diện
+      localeId: "en-US",
     );
     setState(() {
       isListening = true;
@@ -103,7 +103,12 @@ class _PronunciationPracticePageState extends State<PronunciationPracticePage>
 
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
-      recognizedText = result.recognizedWords;
+      List<String> words = result.recognizedWords
+          .trim()
+          .split(' ')
+          .where((word) => word.isNotEmpty)
+          .toList();
+      recognizedText = words.isNotEmpty ? words.last : '';
       confidence = result.confidence;
     });
     _checkPronunciation();
@@ -122,7 +127,7 @@ class _PronunciationPracticePageState extends State<PronunciationPracticePage>
         _successController.reverse();
       });
       _showCustomSnackBar("Tuyệt vời! Phát âm chính xác! 🎉", true);
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(milliseconds: 800), () {
         _nextWord();
       });
     } else if (recognizedText.isNotEmpty) {

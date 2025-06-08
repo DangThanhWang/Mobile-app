@@ -2,7 +2,6 @@ import 'package:app/Components/Footer/Menu.dart';
 import 'package:app/Definitons/global.dart';
 import 'package:app/Definitons/size_config.dart';
 import 'package:app/Pages/Pronunciation/Pronunciation_Topic.dart';
-import 'package:app/Pages/Ranking/RankingPage.dart';
 import 'package:app/Pages/Home/HomePage.dart';
 import 'package:app/Pages/News/NewsPage.dart';
 import 'package:app/Pages/Profile/UserProfilePage.dart';
@@ -54,7 +53,8 @@ class _ChatBotPageState extends State<ChatBotPage> {
       if (globalRooms != null) {
         newRoomId = globalRooms!;
       } else {
-        newRoomId = await roomService.createRoom(userId, 'Cuộc trò chuyện với AI');
+        newRoomId =
+            await roomService.createRoom(userId, 'Cuộc trò chuyện với AI');
         globalRooms = newRoomId;
       }
 
@@ -79,7 +79,8 @@ class _ChatBotPageState extends State<ChatBotPage> {
       final userId = globalUserId;
       if (userId == null) return;
 
-      final newRoomId = await roomService.createRoom(userId, 'Cuộc trò chuyện mới với AI');
+      final newRoomId =
+          await roomService.createRoom(userId, 'Cuộc trò chuyện mới với AI');
       globalRooms = newRoomId;
 
       setState(() {
@@ -227,11 +228,11 @@ class _MainPageState extends State<MainPage> {
               });
             },
             children: [
-              const HomePage(),                // Index 0: Home
-              Pronunciation_Topic(),           // Index 1: Pronunciation
-              const NewsPage(),               // Index 2: News
-              const ChatBotPage(),            // Index 3: Chatbot AI
-              const UserProfilePage(),        // Index 4: Profile
+              const HomePage(), // Index 0: Home
+              Pronunciation_Topic(), // Index 1: Pronunciation
+              const NewsPage(), // Index 2: News
+              const ChatBotPage(), // Index 3: Chatbot AI
+              const UserProfilePage(), // Index 4: Profile
             ],
           ),
 

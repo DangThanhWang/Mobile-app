@@ -108,11 +108,15 @@ class _LoginState extends State<Login> {
         return;
       }
       // Đăng nhập thành công
-      String? name = existingUser['name'];
+      String? name = existingUser['userName'];
+      String? email = existingUser['email'];
       String? photoUrl = existingUser['photoUrl'];
       String? uid = existingUser['userId'];
       globalUserId = uid;
-      print(globalUserId);
+      gmailUser = email;
+      globalUserName = name;
+      print(
+          'globalUserId: $globalUserId, gmailUser: $gmailUser, globalUserName: $globalUserName');
 
       // Điều hướng đến trang Home và truyền thông tin người dùng
       Navigator.pushReplacementNamed(
