@@ -116,8 +116,8 @@ Triopybara is a comprehensive English learning mobile application designed to he
 
 ### Backend & Services
 - **Authentication**: MongoDB & Firebase Auth,
-- **Database**: MongoDB Atlas
-- **File Storage**: MongoDB & Firebase Storage
+- **Database**: MongoDB Atlas & Sqlite
+- **File Storage**: MongoDB & Firebase Storage & Sqlite
 
 ### AI & ML
 - **Model**: Fine-tuned Qwen2-1.5B
