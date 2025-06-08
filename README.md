@@ -68,11 +68,6 @@ Triopybara is a comprehensive English learning mobile application designed to he
     - Personalized learning recommendations
     - Multi-language support (Vietnamese & English)
 
-- **📹 Video Calling**
-    - Peer-to-peer language practice
-    - WebRTC-based real-time communication
-    - Automatic pairing with other learners
-
 - **📱 Smart Dictionary**
     - Offline English-Vietnamese dictionary
     - Quick search with suggestions
@@ -123,7 +118,6 @@ Triopybara is a comprehensive English learning mobile application designed to he
 - **Authentication**: Firebase Auth
 - **Database**: MongoDB Atlas
 - **File Storage**: Firebase Storage
-- **Real-time Communication**: WebRTC for video calls
 
 ### AI & ML
 - **Model**: Fine-tuned Qwen2-1.5B
@@ -179,8 +173,8 @@ lib/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/triopybara.git
-   cd triopybara
+   git clone https://github.com/DangThanhWang/Mobile-app.git
+   cd Mobile-app
    ```
 
 2. **Install dependencies**
@@ -382,9 +376,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-- **Quang** - Project Lead & Backend Development
-- **Tai** - Flutter Development & UI/UX
-- **Thanh** - AI/ML Integration & Testing
+- **Dinh Duc Tai** - Project Lead & Backend Development
+- **Dang Thanh Quang** - AI/ML Integration & Testing 
+- **Dang Viet Thanh** - Flutter Development & UI/UX
 
 ## 🙏 Acknowledgments
 
