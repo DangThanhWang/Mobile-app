@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Triopybara Logo](assets/images/capylogo.png)
+<img src="assets/images/capylogo.png" alt="Triopybara Logo" width="200"/>
 
 **A comprehensive English learning mobile application built with Flutter**
 
