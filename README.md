@@ -91,7 +91,7 @@ Triopybara is a comprehensive English learning mobile application designed to he
 ### 👤 User Management
 
 - **🔐 Authentication**
-    - Firebase Authentication
+    - MongoDB Authentication
     - Google Sign-In integration
     - Email/password registration
     - Profile management
@@ -115,9 +115,9 @@ Triopybara is a comprehensive English learning mobile application designed to he
 - **UI Components**: Custom widgets with Material Design
 
 ### Backend & Services
-- **Authentication**: Firebase Auth
+- **Authentication**: MongoDB & Firebase Auth,
 - **Database**: MongoDB Atlas
-- **File Storage**: Firebase Storage
+- **File Storage**: MongoDB & Firebase Storage
 
 ### AI & ML
 - **Model**: Fine-tuned Qwen2-1.5B
@@ -146,6 +146,7 @@ lib/
 ├── Database/          # Database configurations
 │   └── mongoDB.dart
 ├── Definitons/        # App constants and configurations
+├── Sources/           # where dictionary information and flashcards are stored
 ├── helpers/           # Utility functions and helpers
 ├── Middlewares/       # Custom middleware components
 ├── Pages/             # Main application pages
@@ -168,6 +169,7 @@ lib/
 - Android Studio / VS Code
 - Firebase account
 - MongoDB Atlas account
+- Sqlite
 
 ### Setup Steps
 
@@ -192,8 +194,10 @@ lib/
     - Create MongoDB Atlas account
     - Set up cluster and database
     - Update connection string in `lib/Definitons/Constants.dart`
+5. **Sqlite Setup**
+    - Ensure data in sources is run
 
-5. **Run the application**
+6. **Run the application**
    ```bash
    flutter run
    ```
@@ -244,19 +248,19 @@ const QWEN_MODEL_URL = 'your-ngrok-or-api-endpoint';
     - Choose topics you want to focus on
     - Start with vocabulary flashcards or pronunciation practice
 
-3. **AI Chatbot**
-    - Access the chatbot from the bottom navigation
-    - Ask questions about English grammar, vocabulary, or practice conversations
-    - The AI provides personalized responses and learning recommendations
-
-4. **Pronunciation Practice**
+3. **Pronunciation Practice**
     - Navigate to the Pronunciation section
     - Select IPA sounds to practice
     - Listen to correct pronunciation and record yourself
     - Get instant feedback on your pronunciation accuracy
 
-5. **Progress Tracking**
-    - Check your ranking on the leaderboard
+4. **AI Chatbot**
+    - Access the chatbot from the bottom navigation
+    - Ask questions about English grammar, vocabulary, or practice conversations
+    - The AI provides personalized responses and learning recommendations
+
+5. **Progress Tracking is Game**
+    - Check your ranking on the leaderboard 
     - View detailed progress statistics
     - Earn points and badges for consistent learning
 
@@ -343,8 +347,7 @@ flutter drive --target=test_driver/app.dart
 - [ ] Vocabulary learning modules
 - [ ] Pronunciation practice with audio
 - [ ] Chatbot conversations
-- [ ] Video calling functionality
-- [ ] Progress tracking and rankings
+- [ ] Progress tracking and rankings is Game
 
 ## 🐛 Troubleshooting
 
@@ -355,7 +358,7 @@ flutter drive --target=test_driver/app.dart
     - Check internet connectivity
     - Ensure Firebase configuration files are correctly placed
 
-2. **MongoDB Connection Issues**
+2. **MongoDB & Sqlite Connection Issues**
     - Verify connection string format
     - Check network whitelist in MongoDB Atlas
     - Ensure database permissions are correctly set
@@ -364,8 +367,12 @@ flutter drive --target=test_driver/app.dart
     - Grant microphone and camera permissions
     - Test on physical device (not emulator)
     - Check WebRTC compatibility
-
-4. **AI Chatbot Not Responding**
+      
+4. **Game Issues**
+    - Performance Optimization
+    - Data & Memory Management
+     
+5. **AI Chatbot Not Responding**
     - Verify API endpoint is accessible
     - Check ngrok tunnel status
     - Ensure model is properly deployed
@@ -385,6 +392,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Flutter Team](https://flutter.dev) for the amazing framework
 - [Firebase](https://firebase.google.com) for backend services
 - [MongoDB](https://mongodb.com) for database solutions
+- [Sqlite]((https://www.sqlite.org/)) for database solutions
 - [Qwen Team](https://github.com/QwenLM/Qwen) for the base AI model
 - All contributors and beta testers
 
