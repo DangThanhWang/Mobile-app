@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:provider/provider.dart';
 import 'package:app/Definitons/global.dart';
 import 'package:app/Definitons/size_config.dart';
 import 'package:app/Widgets/Profile/Components/ProfileHeader.dart';
@@ -8,6 +9,7 @@ import 'package:app/Widgets/Profile/Components/SettingsTab.dart';
 import 'package:app/Widgets/Profile/Components/CoachTab.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:app/Providers/UserProvider.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -64,8 +66,8 @@ class _UserProfilePage extends State<UserProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    final userName = context.watch<UserProvider>().userName;
     AppSizes().init(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: FadeTransition(

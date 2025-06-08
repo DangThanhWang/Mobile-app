@@ -2,6 +2,8 @@
 import 'package:app/Definitons/global.dart';
 import 'package:app/Pages/Auth/InitialSetup.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/Providers/UserProvider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide State, Center;
 // ignore: depend_on_referenced_packages
@@ -190,6 +192,14 @@ class _SignUpState extends State<SignUp> {
       print(globalUserId);
 
       await usersCollection.insertOne(newUser);
+      final nameFromDb = await MongoDBDatabase.getUserName(globalUserId!);
+      final scoreFromDb =
+          await MongoDBDatabase.getUserScoreString(globalUserId!);
+      await MongoDBDatabase.upsertUserProgress(globalUserId!,
+          name: nameFromDb, score: scoreFromDb);
+      Provider.of<UserProvider>(context, listen: false).setUser(
+        nameFromDb,
+      );
 
       // Hiển thị thông báo thành công
       if (!mounted) return;

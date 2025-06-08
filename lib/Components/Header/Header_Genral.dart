@@ -1,6 +1,9 @@
 import 'package:app/Definitons/global.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:app/Database/mongoDB.dart';
+import 'package:provider/provider.dart';
+import 'package:app/Providers/UserProvider.dart';
 
 // ignore: must_be_immutable
 // class Info extends StatelessWidget {
@@ -25,6 +28,15 @@ class _Info extends State<Info> with SingleTickerProviderStateMixin {
     super.initState();
     userName = globalUserName;
     userPhotoUrl = user?.photoURL;
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final userId = user?.uid;
+    final nameFromDb = await MongoDBDatabase.getUserName(userId ?? "");
+    setState(() {
+      userName = nameFromDb.isNotEmpty ? nameFromDb : 'NO NAME';
+    });
   }
 
   // Làm mới dữ liệu người dùng từ Firebase
@@ -39,6 +51,8 @@ class _Info extends State<Info> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final providerUserName =
+        Provider.of<UserProvider>(context).userName ?? "User";
     return Container(
       decoration: BoxDecoration(
         color: Color(0xDA805029),
@@ -75,7 +89,7 @@ class _Info extends State<Info> with SingleTickerProviderStateMixin {
                     ],
                   ),
                   Text(
-                    userName ?? "User",
+                    providerUserName,
                     style: TextStyle(
                       fontSize: 22,
                       fontFamily: "Rubik",

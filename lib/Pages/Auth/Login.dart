@@ -6,6 +6,8 @@ import 'package:app/Definitons/global.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/Providers/UserProvider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide State, Center;
 // ignore: depend_on_referenced_packages
@@ -59,6 +61,16 @@ class _LoginState extends State<Login> {
       if (user != null) {
         String? name = user.displayName;
         String? photoUrl = user.photoURL;
+        String uid = user.uid;
+        globalUserId = uid;
+        final nameFromDb = await MongoDBDatabase.getUserName(globalUserId!);
+        final scoreFromDb =
+            await MongoDBDatabase.getUserScoreString(globalUserId!);
+        await MongoDBDatabase.upsertUserProgress(globalUserId!,
+            name: nameFromDb, score: scoreFromDb);
+        Provider.of<UserProvider>(context, listen: false).setUser(
+          nameFromDb,
+        );
 
         // Điều hướng đến trang Home và truyền thông tin người dùng
         Navigator.pushReplacementNamed(
@@ -117,6 +129,15 @@ class _LoginState extends State<Login> {
       globalUserName = name;
       print(
           'globalUserId: $globalUserId, gmailUser: $gmailUser, globalUserName: $globalUserName');
+
+      final nameFromDb = await MongoDBDatabase.getUserName(globalUserId!);
+      final scoreFromDb =
+          await MongoDBDatabase.getUserScoreString(globalUserId!);
+      await MongoDBDatabase.upsertUserProgress(globalUserId!,
+          name: nameFromDb, score: scoreFromDb);
+      Provider.of<UserProvider>(context, listen: false).setUser(
+        nameFromDb,
+      );
 
       // Điều hướng đến trang Home và truyền thông tin người dùng
       Navigator.pushReplacementNamed(

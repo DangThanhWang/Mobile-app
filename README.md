@@ -77,10 +77,10 @@ Triopybara is a comprehensive English learning mobile application designed to he
 ### 📊 Progress & Social Features
 
 - **🏆 Ranking System**
-    - Weekly and monthly leaderboards
+    - All time leaderboards
     - Point-based progression
-    - Achievement badges
-    - Performance analytics
+    - Healthy encouragement
+    - Friendly competitive
 
 - **📰 Reading Materials**
     - Curated news articles
@@ -154,9 +154,13 @@ lib/
 │   ├── ChatBox/       # Chat functionality
 │   ├── Home/          # Home and learning modules
 │   ├── Pronunciation/ # Pronunciation practice
-│   └── Profile/       # User profile management
+│   └── Profile/       # User profile page
 ├── Services/          # External API services
 ├── Widgets/           # Reusable widget components
+│   ├── Auth/          # Authentication widgets
+│   ├── ChatBox/       # Chat Box widgets
+│   ├── Games/         # Games and leaderboard
+│   ├── Profile/       # User profile management
 └── main.dart          # Application entry point
 ```
 
@@ -248,18 +252,23 @@ const QWEN_MODEL_URL = 'your-ngrok-or-api-endpoint';
     - Choose topics you want to focus on
     - Start with vocabulary flashcards or pronunciation practice
 
-3. **Pronunciation Practice**
+3. **Quizzes with scores**
+    - Training your well-learned English skills with quizzes
+    - Track your study progress
+    - Friendly compete with your peers through leaderboard
+
+4. **Pronunciation Practice**
     - Navigate to the Pronunciation section
     - Select IPA sounds to practice
     - Listen to correct pronunciation and record yourself
     - Get instant feedback on your pronunciation accuracy
 
-4. **AI Chatbot**
+5. **AI Chatbot**
     - Access the chatbot from the bottom navigation
     - Ask questions about English grammar, vocabulary, or practice conversations
     - The AI provides personalized responses and learning recommendations
 
-5. **Progress Tracking is Game**
+6. **Progress Tracking is Game**
     - Check your ranking on the leaderboard 
     - View detailed progress statistics
     - Earn points and badges for consistent learning
@@ -371,6 +380,7 @@ flutter drive --target=test_driver/app.dart
 4. **Game Issues**
     - Performance Optimization
     - Data & Memory Management
+    - Scalability difficulty
      
 5. **AI Chatbot Not Responding**
     - Verify API endpoint is accessible

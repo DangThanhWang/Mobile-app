@@ -9,6 +9,8 @@ import 'package:app/Widgets/ChatBox/HelpCenter.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'Providers/UserProvider.dart';
 
 import 'Pages/Auth/Login.dart';
 import 'Pages/Auth/SignUp.dart';
@@ -21,7 +23,14 @@ void main() async {
   await MongoDBDatabase.connect();
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

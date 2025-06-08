@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide State, Center;
+import 'package:provider/provider.dart';
+import 'package:app/Providers/UserProvider.dart';
 
 import 'package:app/Definitons/global.dart';
 
@@ -146,6 +148,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
           gmailUser = currentUser['email'];
         }
 
+        final scoreFromDb =
+          await MongoDBDatabase.getUserScoreString(globalUserId!);
+        await MongoDBDatabase.upsertUserProgress(
+          globalUserId!,
+          name: _nameController.text.trim(),
+          score: scoreFromDb,
+        );
+        Provider.of<UserProvider>(context, listen: false)
+            .setUserName(_nameController.text.trim());
+
         setState(() {
           _isLoading = false;
         });
@@ -158,7 +170,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hồ sơ đã được cập nhật thành công.')),
+          SnackBar(
+              content: Text(
+                  'Hồ sơ đã được cập nhật thành công. ${_nameController.text} ')),
         );
       } catch (e) {
         setState(() {

@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:app/Database/mongoDB.dart';
+import 'package:provider/provider.dart';
+import 'package:app/Providers/UserProvider.dart';
+import 'package:app/Definitons/global.dart';
 import 'package:app/Widgets/Games/Widget_Game/IdiomsQuiz.dart';
 import 'package:app/Widgets/Games/Widget_Game/QuestionQuiz.dart';
 import 'package:app/Widgets/Games/Widget_Game/SpellingQuiz.dart';
 import 'package:app/Widgets/Games/Widget_Game/VocabularyQuiz.dart';
+import 'package:app/Widgets/Games/LeaderboardPage.dart';
+import 'package:app/Widgets/Games/ProgressPage.dart';
 
-class GamePage extends StatelessWidget {
+class GamePage extends StatefulWidget {
+  @override
+  State<GamePage> createState() => _GamePageState();
+  static List<int> userScores = [0, 0, 0, 0, 0];
+}
+
+class _GamePageState extends State<GamePage> {
+  List<int> userScores = [0, 0, 0, 0, 0];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserScores();
+  }
+
+  Future<void> fetchUserScores() async {
+    List<int> scores = [];
+    for (int i = 0; i < 5; i++) {
+      int score = await MongoDBDatabase.getUserScore(globalUserId!, index: i);
+      scores.add(score);
+    }
+    setState(() {
+      userScores = scores;
+      GamePage.userScores = scores;
+    });
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.setTotalScore(scores[4]);
+  }
+
   final List<Map<String, dynamic>> quizData = [
     {
       "icon": Icons.text_fields,
@@ -34,14 +69,17 @@ class GamePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userName = context.watch<UserProvider>().userName;
+    final totalScore = context.watch<UserProvider>().totalScore;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          "Hello, User!",
-          style: TextStyle(
+        title: Text(
+          "Hello, $userName!",
+          style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -51,12 +89,12 @@ class GamePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Row(
-              children: const [
-                Icon(Icons.monetization_on, color: Colors.orange),
-                SizedBox(width: 5),
+              children: [
+                const Icon(Icons.sports_score, color: Colors.orange),
+                const SizedBox(width: 5),
                 Text(
-                  "602",
-                  style: TextStyle(
+                  "$totalScore",
+                  style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
@@ -72,7 +110,7 @@ class GamePage extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 25, 16, 0),
             child: Text(
-              "What would you like to play today?",
+              "Hôm nay bạn muốn chơi gì?",
               style: TextStyle(
                 color: Colors.black87,
                 fontSize: 20,
@@ -112,7 +150,19 @@ class GamePage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(quiz['icon'], size: 50, color: Colors.orange),
+                        Icon(
+                          quiz['icon'],
+                          size: 50,
+                          color: quiz['title'] == "Ngữ pháp"
+                              ? Colors.orange
+                              : quiz['title'] == "Câu hỏi"
+                                  ? Colors.blue
+                                  : quiz['title'] == "Chính tả"
+                                      ? Colors.green
+                                      : quiz['title'] == "Idioms"
+                                          ? Colors.purple
+                                          : Colors.orange,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           quiz['title'],
@@ -128,7 +178,7 @@ class GamePage extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.grey,
+                            color: Colors.orange,
                           ),
                         ),
                       ],
@@ -142,7 +192,7 @@ class GamePage extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Unfinished Games",
+              "Theo dõi tiến trình của bạn",
               style: TextStyle(
                 color: Colors.black87,
                 fontSize: 20,
@@ -152,52 +202,78 @@ class GamePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ListView.builder(
-              itemCount: quizData.length,
-              itemBuilder: (context, index) {
-                final quiz = quizData[index];
-                return Container(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Container(
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        blurRadius: 6,
-                        offset: const Offset(2, 4),
-                      ),
-                    ],
                   ),
                   child: ListTile(
-                    leading: Icon(
-                      quiz['icon'],
-                      size: 40,
-                      color: Colors.orange,
+                    leading: const Icon(Icons.timeline,
+                        size: 40, color: Colors.blue),
+                    title: const Text(
+                      "Tiến độ học tập",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                    title: Text(
-                      quiz['title'],
-                      style: const TextStyle(
+                    subtitle: Text(
+                      "Tiến độ hoàn thành mỗi bài tập của bạn",
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.orange),
+                    ),
+                    trailing:
+                        const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProgressPage()),
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Icons.leaderboard,
+                        size: 40, color: Colors.green),
+                    title: const Text(
+                      "Bảng xếp hạng",
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
                     subtitle: const Text(
-                      "20 Questions",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      "Xem thứ hạng của bạn so với mọi người",
+                      style: TextStyle(fontSize: 14, color: Colors.orange),
                     ),
-                    trailing: CircularProgressIndicator(
-                      value: 0.6,
-                      backgroundColor: Colors.grey.shade300,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.orange),
-                    ),
+                    trailing:
+                        const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LeaderboardPage()),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
         ],

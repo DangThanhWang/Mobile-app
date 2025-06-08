@@ -48,7 +48,7 @@ class Feature extends StatelessWidget {
                   height: 10,
                 ),
                 _buildText("Tham gia thử thách bằng", 18, FontWeight.bold),
-                _buildText("các trò trò chơi về từ vựng", 18, FontWeight.bold),
+                _buildText("các trò chơi về từ vựng", 18, FontWeight.bold),
                 SizedBox(height: 15),
                 _FindFriendsButton(),
               ],
@@ -93,7 +93,8 @@ class _FindFriendsButton extends StatelessWidget {
             ),
             SizedBox(width: 10),
             Text(
-              "Play game",
+              "Chơi ngay",
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF7A6CE4),
