@@ -1,11 +1,11 @@
-import 'package:app/Data/News/dummy.dart';
+import 'package:app/Definitons/dummy.dart';
 import 'package:app/Definitons/normalizePage.dart';
 import 'package:app/Widgets/News/home_slider_item.dart';
 import 'package:app/helpers/DotsIndicator.dart';
 import 'package:flutter/material.dart';
 
 class HomeSlider extends StatefulWidget {
-  const HomeSlider({Key? key}) : super(key: key);
+  const HomeSlider({super.key});
 
   @override
   State<HomeSlider> createState() => _HomeSliderState();
@@ -61,7 +61,10 @@ class _HomeSliderState extends State<HomeSlider> {
           height: 10,
         ),
         DotsIndicator(
-            currentIndex: normalizePageIndex(_pageIndex), totalDots: 8,onDotTap: null ,),
+          currentIndex: normalizePageIndex(_pageIndex),
+          totalDots: 8,
+          onDotTap: null,
+        ),
       ],
     ));
   }

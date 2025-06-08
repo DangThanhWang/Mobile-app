@@ -3,7 +3,7 @@ import 'package:app/Widgets/News/new_list_item.dart';
 import 'package:flutter/material.dart';
 
 class NewsList extends StatelessWidget {
-  const NewsList({Key? key}) : super(key: key);
+  const NewsList({super.key, required String category});
 
   @override
   Widget build(BuildContext context) {

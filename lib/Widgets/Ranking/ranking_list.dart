@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class RankingList extends StatelessWidget {
   final bool check;
-  const RankingList({Key? key, required this.check}) : super(key: key);
+  const RankingList({super.key, required this.check});
 
   @override
   Widget build(BuildContext context) {
