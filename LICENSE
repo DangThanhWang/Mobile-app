@@ -1,0 +1,106 @@
+MIT License
+
+Copyright (c) 2025 TriopyBara Team (Quang, Tai, Thanh)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Third-Party Licenses and Acknowledgments
+
+This project uses various open-source libraries and services. Please refer to their respective licenses:
+
+### Flutter & Dart Packages
+- **Flutter Framework**: BSD-3-Clause License
+- **Firebase SDK**: Apache License 2.0
+- **MongoDB Dart**: MIT License
+- **AudioPlayers**: MIT License
+- **Speech-to-Text**: MIT License
+- **Flutter TTS**: MIT License
+- **Image Picker**: Apache License 2.0
+- **WebRTC**: BSD License
+- **And other packages listed in pubspec.yaml**
+
+### AI Model
+- **Qwen2-1.5B**: Apache License 2.0 (Alibaba Cloud)
+- **Transformers Library**: Apache License 2.0 (Hugging Face)
+- **PEFT (LoRA)**: Apache License 2.0
+
+### Assets and Resources
+- **Images**: Various sources (please ensure proper attribution)
+- **Audio Files**: Educational use with proper licensing
+- **Fonts**: Open Font License (if applicable)
+
+### External Services
+- **Firebase**: Google Terms of Service
+- **MongoDB Atlas**: MongoDB Terms of Service
+- **Ngrok**: Ngrok Terms of Service
+
+## Usage Guidelines
+
+### Educational Use
+- This app is primarily designed for English language learning
+- Educational institutions may use this freely for non-commercial purposes
+- Please provide attribution when using in academic contexts
+
+### Commercial Use
+- Commercial use is permitted under the MIT License
+- Consider the terms of third-party services (Firebase, MongoDB, etc.)
+- Ensure compliance with AI model licensing terms
+
+### Data Privacy
+- Users are responsible for implementing proper data privacy measures
+- Comply with GDPR, CCPA, and other applicable privacy regulations
+- Review Firebase and MongoDB privacy policies
+
+## Disclaimer
+
+### AI-Generated Content
+- Responses from the AI chatbot are generated automatically
+- Content accuracy is not guaranteed
+- Use AI responses as supplementary learning material only
+
+### Educational Content
+- Vocabulary, pronunciation, and grammar content is for educational purposes
+- Verify information through authoritative sources
+- Not a replacement for professional language instruction
+
+### Technical Support
+- This software is provided as-is without warranty
+- Community support available through project repositories
+- Professional support not guaranteed
+
+## Contributing
+
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request with clear documentation
+4. Ensure code quality and testing
+
+## Contact
+
+For questions or concerns regarding this license:
+- Project Repository: [GitHub URL]
+- Email: [Contact Email]
+- Issues: Use GitHub Issues for bug reports
+
+---
+
+**Note**: This license applies to the TriopyBara application code. Individual components, libraries, and services retain their original licenses. Users must comply with all applicable third-party terms and conditions.
