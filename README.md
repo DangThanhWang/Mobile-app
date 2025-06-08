@@ -375,7 +375,6 @@ flutter drive --target=test_driver/app.dart
 3. **Audio/Video Issues**
     - Grant microphone and camera permissions
     - Test on physical device (not emulator)
-    - Check WebRTC compatibility
       
 4. **Game Issues**
     - Performance Optimization
