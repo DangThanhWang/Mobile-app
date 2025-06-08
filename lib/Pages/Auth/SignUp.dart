@@ -1,5 +1,6 @@
 // ignore: file_names
 import 'package:app/Definitons/global.dart';
+import 'package:app/Pages/Auth/InitialSetup.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide State, Center;
@@ -18,6 +19,7 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -93,6 +95,16 @@ class _SignUpState extends State<SignUp> {
     });
 
     // Kiểm tra các trường dữ liệu
+    if (_userNameController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all fields.';
+      });
+      return;
+    }
+
+    // Kiểm tra các trường dữ liệu
     if (_emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
@@ -145,6 +157,17 @@ class _SignUpState extends State<SignUp> {
         return;
       }
 
+      // Kiểm tra xem email đã tồn tại chưa
+      final existingUserName = await usersCollection.findOne(
+          where.eq('userName', _userNameController.text.trim().toLowerCase()));
+      if (existingUserName != null) {
+        setState(() {
+          _errorMessage = 'UserName already registered.';
+          _isLoading = false;
+        });
+        return;
+      }
+
       // Mã hóa mật khẩu trước khi lưu vào DB
       final hashedPassword = _hashPassword(_passwordController.text.trim());
 
@@ -153,6 +176,7 @@ class _SignUpState extends State<SignUp> {
         // ignore: deprecated_member_use
         "userId": ObjectId().toHexString(),
         "email": _emailController.text.trim().toLowerCase(),
+        "userName": _userNameController.text.trim(),
         "password": hashedPassword,
         "subscription": {
           "plan": "free",
@@ -173,13 +197,18 @@ class _SignUpState extends State<SignUp> {
         SnackBar(
           content: Text('Registration successful!'),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 1),
         ),
       );
 
       // Sau khi đăng ký thành công, chuyển đến trang chính
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const InitialSetupPage(),
+        ),
+      );
     } catch (e) {
       setState(() {
         _errorMessage =
@@ -235,6 +264,23 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
               const SizedBox(height: 25),
+              TextField(
+                controller: _userNameController,
+                keyboardType: TextInputType.name,
+                decoration: InputDecoration(
+                  labelText: 'UserName',
+                  hintText: 'Enter your UserName',
+                  prefixIcon: Icon(LineAwesomeIcons.envelope),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Color(0xFFD3B591), width: 2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,

@@ -19,7 +19,7 @@ class QuizManager {
       if (selectedOption == currentQuestion["answer"]) {
         _showSnackBar("Đúng rồi!", Colors.green);
 
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(milliseconds: 800), () {
           if (currentQuestionIndex < questions.length - 1) {
             currentQuestionIndex++;
             hasAnswered = false;
@@ -34,7 +34,7 @@ class QuizManager {
         isRetrying = true; // Cho phép thử lại khi sai
         _showSnackBar("Sai rồi! Hãy thử lại!", Colors.red);
 
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(milliseconds: 800), () {
           isRetrying = false;
           hasAnswered = false; // Cho phép chọn lại sau khi hiện thông báo
           updateUI();
@@ -48,7 +48,7 @@ class QuizManager {
       SnackBar(
         content: Text(message),
         backgroundColor: color,
-        duration: const Duration(seconds: 1),
+        duration: const Duration(milliseconds: 800),
       ),
     );
   }

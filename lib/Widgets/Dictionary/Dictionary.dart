@@ -3,6 +3,7 @@ import 'package:app/helpers/dbHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_tts/flutter_tts.dart'; // Thêm package này
 
 class Dictionary extends StatefulWidget {
   const Dictionary({super.key});
@@ -35,6 +36,10 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
+  // Thêm FlutterTts instance
+  FlutterTts flutterTts = FlutterTts();
+  bool _isSpeaking = false;
+
   var dbHelper = DatabaseHelper();
   List<Map<String, dynamic>> words = [];
 
@@ -56,6 +61,39 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
+
+    // Khởi tạo TTS
+    _initTts();
+  }
+
+  // Khởi tạo Text-to-Speech
+  void _initTts() async {
+    await flutterTts.setLanguage("en-US"); // Đặt ngôn ngữ tiếng Anh
+    await flutterTts.setSpeechRate(0.5); // Tốc độ nói (0.0 - 1.0)
+    await flutterTts.setVolume(1.0); // Âm lượng (0.0 - 1.0)
+    await flutterTts.setPitch(1.0); // Cao độ giọng nói (0.5 - 2.0)
+
+    // Lắng nghe trạng thái
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        _isSpeaking = false;
+      });
+    });
+  }
+
+  // Hàm phát âm từ
+  void _speakWord(String word) async {
+    if (_isSpeaking) {
+      await flutterTts.stop();
+      setState(() {
+        _isSpeaking = false;
+      });
+    } else {
+      setState(() {
+        _isSpeaking = true;
+      });
+      await flutterTts.speak(word);
+    }
   }
 
   @override
@@ -63,6 +101,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     _fadeController.dispose();
     _slideController.dispose();
     _controller.dispose();
+    flutterTts.stop(); // Dừng TTS khi dispose
     super.dispose();
   }
 
@@ -166,11 +205,10 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       return [const Text('Không có định nghĩa')];
     }
 
-    // Bỏ ký tự đặc biệt không mong muốn và các thẻ wrapper
     String cleanHtml = htmlDefinition
         .replaceAll('\uFEFF', '')
-        .replaceAll(RegExp(r'^<[IQ]><[QI]>'), '') // Bỏ thẻ mở đầu
-        .replaceAll(RegExp(r'</[QI]></[IQ]>$'), '') // Bỏ thẻ kết thúc
+        .replaceAll(RegExp(r'^<[IQ]><[QI]>'), '')
+        .replaceAll(RegExp(r'</[QI]></[IQ]>$'), '')
         .trim();
 
     // Tách từng dòng theo <br> hoặc <br/>
@@ -217,13 +255,40 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   Widget _buildPhonetic(String line) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Text(
-        line,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-          color: Colors.indigo,
-        ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              line,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.indigo,
+              ),
+            ),
+          ),
+          // Thêm nút phát âm cho phần phonetic
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.indigo.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: IconButton(
+              icon: Icon(
+                _isSpeaking ? Icons.volume_off : Icons.volume_up,
+                color: Colors.indigo,
+                size: 20,
+              ),
+              onPressed: () {
+                // Lấy từ trong ngoặc vuông hoặc toàn bộ dòng
+                String wordToSpeak = line.contains(' ')
+                    ? line.split(' ').first.replaceAll('@', '')
+                    : line.replaceAll('@', '');
+                _speakWord(wordToSpeak);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -575,20 +640,58 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Word Header
+                                // Word Header với nút phát âm
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        _searchResult!.word,
-                                        style: const TextStyle(
-                                          fontSize: 32,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF2D3748),
-                                          letterSpacing: 0.5,
-                                        ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              _searchResult!.word,
+                                              style: const TextStyle(
+                                                fontSize: 32,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF2D3748),
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                          ),
+                                          // Nút phát âm chính
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                right: 12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade600,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.blue
+                                                      .withOpacity(0.3),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                _isSpeaking
+                                                    ? Icons.stop
+                                                    : Icons.volume_up,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
+                                              onPressed: () => _speakWord(
+                                                  _searchResult!.word),
+                                              tooltip: _isSpeaking
+                                                  ? 'Dừng phát âm'
+                                                  : 'Phát âm',
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Container(
@@ -601,6 +704,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                                             color: Colors.white),
                                         onPressed: () => _copyToClipboard(
                                             _searchResult!.word),
+                                        tooltip: 'Sao chép từ',
                                       ),
                                     ),
                                   ],
